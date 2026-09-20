@@ -3,19 +3,48 @@
     <title>Yogesh Games</title>
     <link rel="icon" type="image/png" href="./yogicon.png">
     <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+        padding-top: 70px;
+      }
       #topbar {
-       postition:fixed;
-        width:100%;
-        background-color: #FFFFEE;
-        top:0;
-        left:0;
-        right:0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background-color: #ffffff;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        z-index: 1000;
+      }
+      #topbar img {
+        margin-right: 15px;
+        border-radius: 4px;
+        vertical-align:middle;
+      }
+      #toplink {
+        color: #333333;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+
+      #toplink:hover {
+        color: #007bff; /* Turns blue when hovered */
       }
     </style>
   </head>
   <body>
     <div id="topbar">
-      <image src="./yogicon.png" width="50" height="50" style="vertical-align:middle;"></image>
+      <img src="./yogicon.png" width="50" height="50"></img>
       <a id="toplink">Homepage</a>
     </div>
   </body>
