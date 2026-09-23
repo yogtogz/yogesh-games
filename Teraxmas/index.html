@@ -75,11 +75,15 @@
             document.getElementById("checkbox").addEventListener('change',function() {
               console.log("toggled local gamemodes")
                 if (this.checked) {
+                  console.log("turned on");
                     document.querySelectorAll('localgames').forEach(element => {
+                        console.log(element);
                         element.classList.remove('hidden');
                     });
                 } else {
+                  console.log("turned off");
                     document.querySelectorAll('localgames').forEach(element => {
+                      console.log(element);
                         element.classList.add('hidden');
                     });
                 }
