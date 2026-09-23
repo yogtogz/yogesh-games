@@ -1,4 +1,4 @@
-async function definitionJsonLoader(what) {
+async function definitionJsonLoader(what) { 
   try {
     const entityfetch = await fetch("entity.json");
     const entityStuff = await entityfetch.json();
