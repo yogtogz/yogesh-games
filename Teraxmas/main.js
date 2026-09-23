@@ -17,7 +17,7 @@ async function definitionJsonLoader(what) {
     return er;
   }
 }
-function loadEntites(json = {"error":"did not put json when running loadEntities"}) { // replace with something I guess.
+function loadEntities(json = {"error":"did not put json when running loadEntities"}) { // replace with something I guess.
   console.log("loading entities")
   return json;
 }
