@@ -12,5 +12,6 @@ async function definitionJsonLoader() {
   }
 }
 const entity = definitionJsonLoader();
-alert("Attempting Entity Json Load")
-alert(entity)
+alert("Attempting Entity Json Load");
+alert(entity);
+console.log(entity);
