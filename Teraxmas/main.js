@@ -5,9 +5,9 @@ async function definitionJsonLoader() {
     return entityStuff;
   } catch(er) {
     alert("Error in async")
-    alert(er);
+    alert("scary async error: "+er);
     console.warn("Unable to load json. Client will fail to be able to play :(");
-    console.warn(er);
+    console.warn("scary async error:" + er);
     return er;
   }
 }
