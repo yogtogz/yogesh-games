@@ -1,4 +1,21 @@
+alert("Made without AI.")
 let gamemode = "ffa"
+// Libraries: Shape Player Misc Test
+// Test: Block Circle
+// Test: Include pos:[width and height and x and y and other stuff]
+// Player: Type of player: tank, godly, strange
+// Player: scale, x, y, experience, other stuff.
+// Shape: from entity.json I guess.
+// Shape: Include scale, x, y, experience  (experience is scale)
+// Misc: Bullet
+// Musc: scale,x,y,shape,damage,vx,vy (v = velocity)
+
+// HOW TO USE pos
+// id,library,type,[width, height, x, y, vx, vy],xp,damage,optional:[color:default/hex]
+// "id": id, "library": lib, "type": ty, "pos": [w,h,x,y,vx,vy], "exp": xp, "damage": dmg, "optional": opt
+let objects = [
+  {"id":"test_id","library":"test", "type":"block", "pos":[50,50,0,0,0,0], "optional":["blue"]}
+]
 async function definitionJsonLoader(what) { 
   try {
     const entityfetch = await fetch("entity.json");
@@ -14,17 +31,13 @@ async function definitionJsonLoader(what) {
     alert("scary async error: "+er);
     console.warn("Unable to load json. Client will fail to be able to play :(");
     console.warn("scary async error:" + er);
-    return er;
+    const err = {"error":er}
+    return err;
   }
 }
-function loadEntities(json = {"error":"did not put json when running loadEntities"}) { // replace with something I guess.
-  console.log("loading entities")
-  return json;
-}
-const entity = loadEntities(definitionJsonLoader("entity"));
-
-// Temporary AI generated code helper
-function getArrasBorderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
+const entity = definitionJsonLoader();
+// yes sorry guys I decided to... It's just one function
+function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
     const hexToRgb = (hex) => {
         let cleanHex = hex.replace('#', '');
         return {
@@ -44,11 +57,8 @@ function getArrasBorderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0
     const toHex = (c) => c.toString(16).padStart(2, '0');
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
-
-// ---- Execution Verification ----
-//const centerColor = "#e8c764";
-//const exactArrasBorder = getArrasBorderColor(centerColor);
-//console.log("Arras.io Exact Border Code:", exactArrasBorder); 
+//const color = "#e8c764";
+//const border = borderColor(color);
 
 // Functions
 async function play() {
@@ -108,3 +118,58 @@ function renderGame(what) {
   }
   return true;
 }
+
+// MAIN GAME
+
+function idGen() {
+  const char = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_"
+  let result = ''
+  for (let i = 0; i < math.random(4,24); i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
+
+function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, xp=0, dmg=0,opt=["default"], id=idGen()) {
+  while (objects.some(it => it.id === id)) {
+    id = idGen();
+  }
+  let obj = {
+    "id": id, "library": lib, "type": ty, "pos": [w,h,x,y,vx,vy], "exp": xp, "damage": dmg, "optional": opt
+  };
+  objects.push(obj);
+  return obj;
+}
+
+let lastTime = 0;
+// W w3schools for the tutorial stuff
+function renderCanvas() {
+  
+  const canvas = document.getElementById("myCanvas");
+  const ctx = canvas.getContext("2d");
+
+ctx.setTransform(1, 0, 0, 1, 0, 0); 
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  ctx.fillStyle = "white";
+  objects.forEach(o => {
+    if (o.library == "test") {
+      if (o.type == "block") {
+        ctx.fillStyle = o.optional[0];
+        ctx.fillRect(o.x, o.y, o.w, o.h);
+      }
+    }
+    o.x += o.vx
+    o.y += o.vy
+  })
+}
+function loop(currentTime) {
+  requestAnimationFrame(loop);
+
+  const dt = (currentTime - lastTime) / 1000;
+  lastTime = currentTime;
+
+  renderCanvas();
+}
+
+requestAnimationFrame(loop);
