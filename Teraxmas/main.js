@@ -1,8 +1,13 @@
-async function definitionJsonLoader() {
+async function definitionJsonLoader(what) {
   try {
     const entityfetch = await fetch("entity.json");
     const entityStuff = await entityfetch.json();
+    if (!what) {
+      return {"error":"did not choose what to load"};
+    }
+    if (what==="entity") {
     return entityStuff;
+    }
   } catch(er) {
     alert("Error in async")
     alert("scary async error: "+er);
@@ -11,10 +16,8 @@ async function definitionJsonLoader() {
     return er;
   }
 }
-const entity = definitionJsonLoader();
-alert("Attempting Entity Json Load");
-alert("err: "+entity);
-console.log(entity);
+const entity = definitionJsonLoader("entity");
+console.log("Loading entity")
 
 // Temporary AI generated code helper
 function getArrasBorderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
