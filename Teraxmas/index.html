@@ -45,11 +45,11 @@
       <span style="display:flex;justify-content:center;margin-top:25px;30: %;font-size: 250%;">Teraxmas.io</span>
       <div id="gamelist" style="--width: 350px;--height: 150px;display: flex;width: var(--width);height: var(--height);border-radius: 10px;{width: calc(50% - 100px);};margin-left: calc(50% - var(--width) / 2);overflow-y: auto;flex-direction:column;">
 
-        <button class="choose localgames hidden" onclick="setgamemode('localhost')">LOCALHOST <a href="localhost.help.html" style="color: #339dbf;">help?</a> <span class="counttext">0</span>/<span class="counttext">0</span></button>
-        <button class="choose localgames hidden" onclick="setgamemode('localnetwork')">Local Network <a href="localnetwork.help.html" style="color: #339dbf;">help?</a> <span class="counttext">0</span>/<span class="counttext">0</span></button>
-        <button class="choose localgames hidden" onclick="setgamemode('customip')">Custom IP<a href="customip.safety.html" style="text-decoration:none; background-color:black;">⚠️</a> <a href="customip.help.html" style="color: #339dbf;">help?</a> <span class="counttext">0</span>/<span class="counttext">0</span></button>
-        <button class="choose choosen" onclick="setgamemode('ffa')">FFA <span class="counttext">0</span>/<span class="counttext">0</span></button>
-        <button class="choose" onclick="setgamemode('test')">test <span class="counttext">0</span>/<span class="counttext">0</span></button>
+        <button class="choose localgames hidden" id="localhost" onclick="setgamemode('localhost')">LOCALHOST <a href="localhost.help.html" style="color: #339dbf;">help?</a> <span class="counttext">0</span>/<span class="counttext">0</span></button>
+        <button class="choose localgames hidden" id="localnetwork" onclick="setgamemode('localnetwork')">Local Network <a href="localnetwork.help.html" style="color: #339dbf;">help?</a> <span class="counttext">0</span>/<span class="counttext">0</span></button>
+        <button class="choose localgames hidden" id="customip" onclick="setgamemode('customip')">Custom IP<a href="customip.safety.html" style="text-decoration:none; background-color:black;">⚠️</a> <a href="customip.help.html" style="color: #339dbf;">help?</a> <span class="counttext">0</span>/<span class="counttext">0</span></button>
+        <button class="choose choosen" id="ffa" onclick="setgamemode('ffa')">FFA <span class="counttext">0</span>/<span class="counttext">0</span></button>
+        <button class="choose" id="test" onclick="setgamemode('test')">test <span class="counttext">0</span>/<span class="counttext">0</span></button>
       </div><input spellcheck="false" autocomplete="off" maxlength="36" type="text" id="name" placeholder="This is the story of..." style="
     width: 250px;
     height: 35px;
