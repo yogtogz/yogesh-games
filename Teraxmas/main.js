@@ -16,8 +16,11 @@ async function definitionJsonLoader(what) {
     return er;
   }
 }
-const entity = definitionJsonLoader("entity");
-console.log("Loading entity")
+function loadEntites(json = {"error":"did not put json when running loadEntities"}) { // replace with something I guess.
+  console.log("loading entities")
+  return json;
+}
+const entity = loadEntities(definitionJsonLoader("entity"));
 
 // Temporary AI generated code helper
 function getArrasBorderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
@@ -45,3 +48,46 @@ function getArrasBorderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0
 //const centerColor = "#e8c764";
 //const exactArrasBorder = getArrasBorderColor(centerColor);
 //console.log("Arras.io Exact Border Code:", exactArrasBorder); 
+
+// Functions
+async function play() {
+  await loadingScreen(true);
+  await menu(false);
+  await loadGame();
+  await loadingScreen(false);
+  await renderGame(true);
+  alert('started playing')
+}
+function setgamemode(mode) {
+  alert("Game mode set to "+mode)
+}
+function loadingScreen(what) {
+  let ui = document.getElementById("load");
+  if (what) {
+    ui.style.display = "fixed";
+  } else {
+    ui.style.display = "none";
+  }
+  return true;
+}
+function menu(what) {
+  let ui = document.getElementById("menu");
+  if (what) {
+    ui.style.display = "block";
+  } else {
+    ui.style.display = "none";
+  }
+}
+function loadGame() {
+  alert("loading game");
+  return true;
+}
+function renderGame(what) {
+  let ui = document.getElementById("gamecanvas");
+  if (what) {
+    ui.style.display = "fixed";
+  } else {
+    ui.style.display = "none";
+  }
+  return true;
+}
