@@ -1,7 +1,7 @@
 async function definitionJsonLoader() {
   try {
     const entityfetch = await fetch("entity.json");
-    const entityStuff = await response.json();
+    const entityStuff = await entityfetch.json();
     return entityStuff;
   } catch(er) {
     alert("Error in async")
