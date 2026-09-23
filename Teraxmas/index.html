@@ -70,9 +70,10 @@
     text-shadow: 0px 1px 0 rgba(0,0,0,0.5);
     font: bold 13px / 21px Arial, Helvetica, sans-serif;
 ">Play</button>
-        <input type="checkbox" id="checkbox"><span>Show local gamemodes</span>
+        <br><input type="checkbox" id="checkbox"><span>Show local gamemodes</span>
         <script>
             document.getElementById("checkbox").addEventListener('change',function() {
+              console.log("toggled local gamemodes")
                 if (this.checked) {
                     document.querySelectorAll('localgames').forEach(element => {
                         element.classList.remove('hidden');
