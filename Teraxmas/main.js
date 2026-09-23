@@ -1,3 +1,4 @@
+let gamemode = "ffa"
 async function definitionJsonLoader(what) { 
   try {
     const entityfetch = await fetch("entity.json");
@@ -59,7 +60,9 @@ async function play() {
   alert('started playing')
 }
 function setgamemode(mode) {
+  document.getElementById(gamemode).classList.remove('choosen')
   alert("Game mode set to "+mode)
+  document.getElementById(mode).classList.add('choosen')
 }
 function loadingScreen(what) {
   let ui = document.getElementById("load");
