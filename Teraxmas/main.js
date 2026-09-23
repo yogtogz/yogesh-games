@@ -69,7 +69,7 @@ function loadingScreen(what) {
   alert("visibility of loading screen set to "+what);
   let ui = document.getElementById("load");
   if (what) {
-    ui.style.display = "fixed";
+    ui.style.display = "block"; ui.style.visibility = "fixed"; 
   } else {
     ui.style.display = "none";
   }
@@ -92,7 +92,7 @@ function renderGame(what) {
   alert("rendering game");
   let ui = document.getElementById("gamecanvas");
   if (what) {
-    ui.style.display = "fixed";
+    ui.style.display = "block"; ui.style.visibility = "fixed"; 
   } else {
     ui.style.display = "none";
   }
