@@ -61,7 +61,7 @@ async function play() {
 }
 function setgamemode(mode) {
   document.getElementById(gamemode).classList.remove('choosen')
-  alert("Game mode set to "+mode)
+  alert("Game mode set to "+mode+" from "+gamemode)
   document.getElementById(mode).classList.add('choosen')
 }
 function loadingScreen(what) {
