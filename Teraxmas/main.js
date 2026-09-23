@@ -66,6 +66,7 @@ function setgamemode(mode) {
   gamemode = mode
 }
 function loadingScreen(what) {
+  alert("visibility of loading screen set to "+what);
   let ui = document.getElementById("load");
   if (what) {
     ui.style.display = "fixed";
@@ -75,6 +76,7 @@ function loadingScreen(what) {
   return true;
 }
 function menu(what) {
+  alert("visibility of menu set to "+what);
   let ui = document.getElementById("menu");
   if (what) {
     ui.style.display = "block";
@@ -87,6 +89,7 @@ function loadGame() {
   return true;
 }
 function renderGame(what) {
+  alert("rendering game");
   let ui = document.getElementById("gamecanvas");
   if (what) {
     ui.style.display = "fixed";
