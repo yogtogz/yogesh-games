@@ -52,12 +52,22 @@ function getArrasBorderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0
 
 // Functions
 async function play() {
-  await loadingScreen(true);
-  await menu(false);
-  await loadGame();
+  loadingScreen(true);
+  menu(false);
+  const loaded = await loadGame();
+  if (isLoaded == true) {
   await loadingScreen(false);
   await renderGame(true);
   alert('started playing')
+  } else {
+    alert('unable to start playing :(')
+    loadingScreen(false);
+    menu(true);
+    alert('unable to start playing :(')
+    const reload = prompt("Reload page? (May fix error, if it does not, it's probably being fixed right now.)")
+    if (!reload) alert("Too bad you gotta reload.");
+    window.location.reload()
+  }
 }
 function setgamemode(mode) {
   document.getElementById(gamemode).classList.remove('choosen')
