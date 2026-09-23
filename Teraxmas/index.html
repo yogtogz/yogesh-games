@@ -77,13 +77,13 @@
                 if (this.checked) {
                   console.log("turned on");
                     document.querySelectorAll('localgames').forEach(element => {
-                        console.log(element);
+                        console.log('not hidden no more');
                         element.classList.remove('hidden');
                     });
                 } else {
                   console.log("turned off");
                     document.querySelectorAll('localgames').forEach(element => {
-                      console.log(element);
+                      console.log('hidden alert');
                         element.classList.add('hidden');
                     });
                 }
