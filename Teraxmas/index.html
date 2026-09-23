@@ -1,43 +1,55 @@
-<html style="background-color:gray;"><head><title>Teraxmas.io</title><link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&amp;display=swap" rel="stylesheet">
+<html style="background-color:gray;">
+
+  <head>
+    <title>Teraxmas.io</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&amp;display=swap" rel="stylesheet">
     <script src="main.js"></script>
     <style>
-        .choose {
-            width:100%;
-            height:15%;
-background-color:transparent;
-color: #828282;
-            border:none;
-font-weight: 700;
-        }
-    .choosen {
-color:#a9d86d;
-}
-    input {
-        color:black;
+      .choose {
+        width: 100%;
+        height: 15%;
+        background-color: transparent;
+        color: #828282;
+        border: none;
+        font-weight: 700;
+      }
+
+      .choosen {
+        color: #a9d86d;
+      }
+
+      input {
+        color: black;
+      }
+
+      input::placeholder {
+        color: #cccccc;
+        opacity: 1;
+      }
+
+      button {
+        cursor: pointer;
+      }
+    .hidden {
+        display:none;
     }
-input::placeholder {
-    color:#cccccc;
-    opacity:1;
-}
-    button {
-cursor:pointer;
-}</style>
-</head><body style="display:flex;justify-content:center;align-items:center;font: bold 13px / 21px Arial, Helvetica, sans-serif;">
+    </style>
+  </head>
 
-  
-    
-  
-  
-    <div style="width: 85%; max-width: 760px; height: auto; min-height: 320px; background-color: lightgray; border-radius: 15px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); margin: 0 auto; box-sizing: border-box;"><span style="display:flex;justify-content:center;margin-top:25px;30: %;font-size: 250%;">Teraxmas.io
-</span><div id="gamelist" style="--width: 350px;--height: 150px;display: flex;width: var(--width);height: var(--height);border-radius: 10px;{width: calc(50% - 100px);};margin-left: calc(50% - var(--width) / 2);overflow-y: auto;flex-direction:column;">
+  <body style="display:flex;justify-content:center;align-items:center;font: bold 13px / 21px Arial, Helvetica, sans-serif;">
 
-<button class="choose" onclick="setgamemode('localhost')">LOCALHOST  <a href="localhost.help.html" style="color: #339dbf;">help?</a>      <span class="counttext">0</span>/<span class="counttext">0</span></button><button class="choose" onclick="setgamemode('localnetwork')">Local Network <a href="localnetwork.help.html" style="color: #339dbf;">help?</a>       <span class="counttext">0</span>/<span class="counttext">0</span></button>
-<button class="choose" onclick="setgamemode('customip')">Custom IP<a href="customip.safety.html" style="text-decoration:none; background-color:black;">⚠️</a>  <a href="customip.help.html" style="color: #339dbf;">help?</a>      <span class="counttext">0</span>/<span class="counttext">0</span></button>
-<button class="choose" onclick="setgamemode('ffa')">FFA        <span class="counttext">0</span>/<span class="counttext">0</span></button>
-  <button class="choose" onclick="setgamemode('test')">test        <span class="counttext">0</span>/<span class="counttext">0</span></button>
-</div><input spellcheck="false" autocomplete="off" maxlength="36" type="text" id="name" placeholder="This is the story of..." style="
+    <div style="width: 85%; max-width: 760px; height: auto; min-height: 320px; background-color: lightgray; border-radius: 15px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); margin: 0 auto; box-sizing: border-box;">
+      <span style="display:flex;justify-content:center;margin-top:25px;30: %;font-size: 250%;">Teraxmas.io</span>
+      <div id="gamelist" style="--width: 350px;--height: 150px;display: flex;width: var(--width);height: var(--height);border-radius: 10px;{width: calc(50% - 100px);};margin-left: calc(50% - var(--width) / 2);overflow-y: auto;flex-direction:column;">
+
+        <button class="choose localgames hidden" onclick="setgamemode('localhost')">LOCALHOST <a href="localhost.help.html" style="color: #339dbf;">help?</a> <span class="counttext">0</span>/<span class="counttext">0</span></button>
+        <button class="choose localgames hidden" onclick="setgamemode('localnetwork')">Local Network <a href="localnetwork.help.html" style="color: #339dbf;">help?</a> <span class="counttext">0</span>/<span class="counttext">0</span></button>
+        <button class="choose localgames hidden" onclick="setgamemode('customip')">Custom IP<a href="customip.safety.html" style="text-decoration:none; background-color:black;">⚠️</a> <a href="customip.help.html" style="color: #339dbf;">help?</a> <span class="counttext">0</span>/<span class="counttext">0</span></button>
+        <button class="choose choosen" onclick="setgamemode('ffa')">FFA <span class="counttext">0</span>/<span class="counttext">0</span></button>
+        <button class="choose" onclick="setgamemode('test')">test <span class="counttext">0</span>/<span class="counttext">0</span></button>
+      </div><input spellcheck="false" autocomplete="off" maxlength="36" type="text" id="name" placeholder="This is the story of..." style="
     width: 250px;
     height: 35px;
     margin-left: calc(50% - 250px / 2);
@@ -48,7 +60,7 @@ cursor:pointer;
     outline: none;
     text-align: center;
     font: bold 13px / 21px Arial, Helvetica, sans-serif;
-"><br><button id="play" style="
+"><br><button id="play" onclick="play();" style="
     border: 0px;
     width: 250px;
     height: 40px;
@@ -57,7 +69,23 @@ cursor:pointer;
     margin-top: 5px;
     text-shadow: 0px 1px 0 rgba(0,0,0,0.5);
     font: bold 13px / 21px Arial, Helvetica, sans-serif;
-">Play</button></div>
-  
+">Play</button>
+        <input type="checkbox" id="checkbox"><span>Show local gamemodes</span>
+        <script>
+            document.getElementById("checkbox").addEventListener('change',function() {
+                if (this.checked) {
+                    document.querySelectorAll('localgames').forEach(element => {
+                        element.classList.remove('hidden');
+                    });
+                } else {
+                    document.querySelectorAll('localgames').forEach(element => {
+                        element.classList.add('hidden');
+                    });
+                }
+            })
+        </script>
+    </div>
 
-</body></html>
+  </body>
+
+</html>
