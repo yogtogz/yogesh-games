@@ -63,6 +63,7 @@ function setgamemode(mode) {
   document.getElementById(gamemode).classList.remove('choosen')
   alert("Game mode set to "+mode+" from "+gamemode)
   document.getElementById(mode).classList.add('choosen')
+  gamemode = mode
 }
 function loadingScreen(what) {
   let ui = document.getElementById("load");
