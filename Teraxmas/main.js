@@ -38,7 +38,7 @@ async function definitionJsonLoader(what) {
     return err;
   }
 }
-const entity = definitionJsonLoader();
+const entity = definitionJsonLoader("entity");
 // yes sorry guys I decided to... It's just one function
 function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
     const hexToRgb = (hex) => {
@@ -144,7 +144,7 @@ function renderGame(what) {
   } else {
     ui.style.display = "none";
   }
-  playerid = summonObject("player","tank", 0, 0, (window.innerWidth/2)-5, (window.innerHeight/2)-5, 0, 0, 100, 100, 100, ["#00FFFF", 10], "player").id;
+  playerid = summonObject("player","tank", 0, 0, (window.innerWidth/2)-5, (window.innerHeight/2)-5, 0, 0, 100, 100, 100, [entity.player.color, 10], "player").id;
   return true;
 }
 
