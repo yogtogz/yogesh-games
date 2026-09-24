@@ -156,7 +156,7 @@ function renderGame(what) {
   } else {
     ui.style.display = "none";
   }
-  playerid = summonObject("player","tank", 0, 0, (window.innerWidth/2)-5, (window.innerHeight/2)-5, 0, 0, 100, 100, 100, [entity.player.color, 10], "player").id;
+  playerid = summonObject("player","tank", 0, 0, (window.innerWidth/2)-5, (window.innerHeight/2)-5, 0, 0, 100, 100, 100, [entity.player.tank.color, 10], "player").id;
   return true;
 }
 
