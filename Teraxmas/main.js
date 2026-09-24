@@ -153,6 +153,7 @@ ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   ctx.fillStyle = "white";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (objects.length > 0) {
   objects.forEach(o => {
     if (o.library == "test") {
       if (o.type == "block") {
@@ -162,7 +163,8 @@ ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
     o.pos[2] += o.pos[4]
     o.pos[3] += o.pos[5]
-  })
+  });
+  }
 }
 function loop(currentTime) {
   requestAnimationFrame(loop);
