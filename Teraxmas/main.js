@@ -52,6 +52,7 @@ async function registerJsonVariables() {
   window.entity = await definitionJsonLoader("entity");
   window.worlds = await definitionJsonLoader("worlds");
 }
+registerJsonVariables();
 // yes sorry guys I decided to... It's just one function
 function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
     const hexToRgb = (hex) => {
@@ -264,7 +265,6 @@ function loop(currentTime) {
 
   renderCanvas();
 }
-registerJsonVariables();
 requestAnimationFrame(loop);
 handleKeys(); // Handle key presses
 
