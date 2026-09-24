@@ -112,7 +112,7 @@ function renderGame(what) {
   alert("rendering game");
   let ui = document.getElementById("gamecanvas");
   if (what) {
-    ui.style.display = "block"; ui.style.visibility = "fixed"; 
+    ui.style.display = "block";
   } else {
     ui.style.display = "none";
   }
@@ -124,8 +124,8 @@ function renderGame(what) {
 function idGen() {
   const char = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_"
   let result = ''
-  for (let i = 0; i < math.random(4,24); i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
+  for (let i = 0; i < Math.random(4,24); i++) {
+        result += char.charAt(Math.floor(Math.random() * char.length));
     }
     return result;
 }
@@ -152,15 +152,16 @@ ctx.setTransform(1, 0, 0, 1, 0, 0);
 ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   ctx.fillStyle = "white";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
   objects.forEach(o => {
     if (o.library == "test") {
       if (o.type == "block") {
         ctx.fillStyle = o.optional[0];
-        ctx.fillRect(o.x, o.y, o.w, o.h);
+        ctx.fillRect(o.pos[2], o.pos[3], o.pos[0], o.pos[1]);
       }
     }
-    o.x += o.vx
-    o.y += o.vy
+    o.pos[2] += o.pos[4]
+    o.pos[3] += o.pos[5]
   })
 }
 function loop(currentTime) {
