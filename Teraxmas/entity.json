@@ -17,11 +17,11 @@
     {"name":"Hexadecagon","sides":16,"color":"#111111","level":14,"xp":500000000},
     {"name":"Heptadecagon","sides":17,"color":"#222222","level":15,"xp":1000000000}
     ],
-  "player": [
+  "player": {
     "tank":{"color":"#3ca4cb","type":"default"},
     "godly":{"color":"#F15CE2","type":"ascend"},
     "strange":{"color":"#3A2BEA","type":"weird"}
-  ],
+  },
   "builds": {
     "default": []
   }
