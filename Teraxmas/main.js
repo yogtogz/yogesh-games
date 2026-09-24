@@ -65,7 +65,7 @@ async function play() {
   loadingScreen(true);
   menu(false);
   const loaded = await loadGame();
-  if (isLoaded == true) {
+  if (loaded == true) {
   await loadingScreen(false);
   await renderGame(true);
   alert('started playing')
