@@ -163,7 +163,7 @@ async function renderGame(what) {
   let tankColor = (window.entity && window.entity.player && window.entity.player.tank)
     ? window.entity.player.tank.color 
     : "#3ca4cb";
-  playerid = summonObject("player","tank", 0, 0, (window.innerWidth/2)-5, (window.innerHeight/2)-5, 0, 0, 100, 100, 100, [tankColor, 10], "player").id;
+  playerid = summonObject("player","tank", 0, 0, Math.random(0,worlds[gamemode].width), Math.random(0,worlds[gamemode].height), 0, 0, 100, 100, 100, [tankColor, 10], "player").id;
   // AWAITALL
   const json = await registerJsonVariables();
   const work = json && true // replace true with other stuff
@@ -204,7 +204,7 @@ function renderCanvas() {
 
 ctx.setTransform(1, 0, 0, 1, 0, 0); 
 ctx.clearRect(0, 0, canvas.width, canvas.height);
-// I said no AI but like... Math and Rendering? Me, A Dummy? In Javascript? Robot Time.
+// Math and Rendering? Me, A Dummy? In Javascript? Robot Time.
 let player = objects.find(o => o.tag === "player" && o.id === playerid);
   if (player) {
     camera.x += (player.pos[2] - camera.x) * 0.1;
@@ -214,14 +214,32 @@ let player = objects.find(o => o.tag === "player" && o.id === playerid);
   ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
   ctx.scale(camera.zoom, camera.zoom);
   ctx.translate(-camera.x, -camera.y);
-  let currentWorld = worlds && worlds[gamemode] ? worlds[gamemode] : { width: 2000, height: 2000 };
+  let currentWorld = worlds && worlds[gamemode] ? worlds[gamemode] : { width: 50000, height: 50000 };
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, currentWorld.width, currentWorld.height);
   ctx.strokeStyle = "#cccccc";
   ctx.lineWidth = 4;
   ctx.strokeRect(0, 0, currentWorld.width, currentWorld.height);
-  objects.forEach(o => {
-if (o.tag == "player" && o.id == playerid) {
+  // grid would be nice
+  ctx.strokeStyle = "#e5e5e5";
+  ctx.lineWidth = 1;
+  let gridSize = 50;
+  // Wow, this code appeared out of nowhere!
+  for (let x = 0; x <= currentWorld.width; x += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, currentWorld.height);
+    ctx.stroke();
+  }
+  for (let y = 0; y <= currentWorld.height; y += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(currentWorld.width, y);
+    ctx.stroke();
+  }
+for (let i_am_counting_for_loop_bro = objects.length - 1; i_am_counting_for_loop_bro >= 0; i_am_counting_for_loop_bro--) {
+    const o = objects[i];
+    if (o.tag == "player" && o.id == playerid) {
   let moveX = 0;
   let moveY = 0;
   if (keys["d"]) moveX += 1;
@@ -270,7 +288,7 @@ let actualSpeed = baseSpeed * (50 / diameter);
     }
     o.pos[2] += o.pos[4]
     o.pos[3] += o.pos[5]
-  });
+}
   ctx.restore();
 }
 function loop(currentTime) {
@@ -286,7 +304,7 @@ window.onwheel = function(event) {
   if (event.deltaY > 0) {
     camera.zoom = Math.max(0.5, camera.zoom - 0.1);
   } else {
-    camera.zoom = Math.min(5.0, camera.zoom + 0.1);
+    camera.zoom = Math.min(50, camera.zoom + 0.1);
   }
 };
 
