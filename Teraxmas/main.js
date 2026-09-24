@@ -175,24 +175,25 @@ ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "white";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   objects.forEach(o => {
-    if (o.tag == "player" && o.id == playerid) {
       // I said no AI but like... Math? Me, A Dummy? In Javascript? Robot Time.
-let moveX = 0;
-let moveY = 0;
-if (keys["d"]) moveX += 1;
-if (keys["a"]) moveX -= 1;
-if (keys["s"]) moveY += 1;
-if (keys["w"]) moveY -= 1;
-let length = Math.sqrt(moveX * moveX + moveY * moveY);
-if (length > 0) {
-    moveX /= length;
-    moveY /= length;
+if (o.tag == "player" && o.id == playerid) {
+  let moveX = 0;
+  let moveY = 0;
+  if (keys["d"]) moveX += 1;
+  if (keys["a"]) moveX -= 1;
+  if (keys["s"]) moveY += 1;
+  if (keys["w"]) moveY -= 1;
+  let length = Math.sqrt(moveX * moveX + moveY * moveY);
+  if (length > 0) {
+      moveX /= length;
+      moveY /= length;
+  }
+  let diameter = (o.pos[0] + o.pos[1]) / 2; 
+  let actualSpeed = baseSpeed * (50 / diameter); 
+  o.pos[4] = moveX * actualSpeed;
+  o.pos[5] = moveY * actualSpeed;
 }
-let diameter = (o.width + o.height) / 2;
-let actualSpeed = baseSpeed * (50 / diameter); 
-o.pos[4] = moveX * actualSpeed;
-o.pos[5] = moveY * actualSpeed;
-    }
+
     
     if (o.library == "test") {
       if (o.type == "block") {
