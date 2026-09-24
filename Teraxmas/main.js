@@ -145,7 +145,7 @@ let lastTime = 0;
 // W w3schools for the tutorial stuff
 function renderCanvas() {
   
-  const canvas = document.getElementById("myCanvas");
+  const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
 
 ctx.setTransform(1, 0, 0, 1, 0, 0); 
