@@ -264,6 +264,7 @@ function loop(currentTime) {
 
   renderCanvas();
 }
+registerJsonVariables();
 requestAnimationFrame(loop);
 handleKeys(); // Handle key presses
 
