@@ -1,4 +1,4 @@
-alert("Made without AI.")
+let worldData;
 let baseSpeed = 3; // Base player speed
 let gamemode = "ffa"
 let playerid = "player_object_id_here"
@@ -21,13 +21,18 @@ let objects = [
 ]
 async function definitionJsonLoader(what) { 
   try {
-    const entityfetch = await fetch("entity.json");
-    const entityStuff = await entityfetch.json();
     if (!what) {
       return {"error":"did not choose what to load"};
     }
     if (what==="entity") {
+    const entityfetch = await fetch("entity.json");
+    const entityStuff = await entityfetch.json();
     return entityStuff;
+    }
+    if (what=="worlds") {
+      const worldsfetch = await fetch("worlds.json")
+      const worldsStuff = await worldsfetch.json()
+      return worldsStuff
     }
   } catch(er) {
     alert("Error in async")
@@ -38,7 +43,8 @@ async function definitionJsonLoader(what) {
     return err;
   }
 }
-const entity = definitionJsonLoader("entity");
+window.entity = definitionJsonLoader("entity");
+window.worlds = definitionJsonLoader("worlds");
 // yes sorry guys I decided to... It's just one function
 function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
     const hexToRgb = (hex) => {
@@ -171,11 +177,23 @@ function renderCanvas() {
 
 ctx.setTransform(1, 0, 0, 1, 0, 0); 
 ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  ctx.fillStyle = "white";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+// I said no AI but like... Math and Rendering? Me, A Dummy? In Javascript? Robot Time.
+let player = objects.find(o => o.tag === "player" && o.id === playerid);
+  if (player) {
+    camera.x += (player.pos[2] - camera.x) * 0.1;
+    camera.y += (player.pos[3] - camera.y) * 0.1;
+  }
+  ctx.save();
+  ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
+  ctx.scale(camera.zoom, camera.zoom);
+  ctx.translate(-camera.x, -camera.y);
+  let currentWorld = window.loadedWorlds && window.loadedWorlds[gamemode] ? window.loadedWorlds[gamemode] : { width: 2000, height: 2000 };
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, currentWorld.width, currentWorld.height);
+  ctx.strokeStyle = "#cccccc";
+  ctx.lineWidth = 4;
+  ctx.strokeRect(0, 0, currentWorld.width, currentWorld.height);
   objects.forEach(o => {
-      // I said no AI but like... Math? Me, A Dummy? In Javascript? Robot Time.
 if (o.tag == "player" && o.id == playerid) {
   let moveX = 0;
   let moveY = 0;
@@ -192,6 +210,15 @@ if (o.tag == "player" && o.id == playerid) {
 let actualSpeed = baseSpeed * (50 / diameter);
   o.pos[4] = Number(moveX * actualSpeed) || 0;
   o.pos[5] = Number(moveY * actualSpeed) || 0;
+  let currentWorld = window.loadedWorlds && window.loadedWorlds[gamemode] 
+    ? window.loadedWorlds[gamemode] 
+    : { "width": 50000, "height": 50000 };
+  let nextX = o.pos[2] + o.pos[4];
+  let nextY = o.pos[3] + o.pos[5];
+  if (nextX < 0) { o.pos[4] = 0; o.pos[2] = 0; }
+  if (nextX > currentWorld.width) { o.pos[4] = 0; o.pos[2] = currentWorld.width; }
+  if (nextY < 0) { o.pos[5] = 0; o.pos[3] = 0; }
+  if (nextY > currentWorld.height) { o.pos[5] = 0; o.pos[3] = currentWorld.height; }
 }
 
     
@@ -217,7 +244,7 @@ let actualSpeed = baseSpeed * (50 / diameter);
     o.pos[2] += o.pos[4]
     o.pos[3] += o.pos[5]
   });
-  
+  ctx.restore();
 }
 function loop(currentTime) {
   requestAnimationFrame(loop);
@@ -227,6 +254,13 @@ function loop(currentTime) {
 
   renderCanvas();
 }
-
 requestAnimationFrame(loop);
 handleKeys(); // Handle key presses
+
+window.onwheel = function(event) {
+  if (event.deltaY > 0) {
+    globalZoom = Math.max(0.5, globalZoom - 0.1)
+  } else {
+    globalZoom = Math.min(5.0, globalZoom + 0.1);
+  }
+};
