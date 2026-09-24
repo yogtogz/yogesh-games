@@ -18,7 +18,7 @@
     {"name":"Heptadecagon","sides":17,"color":"#222222","level":15,"xp":1000000000}
     ],
   "player": [
-    {"name":"tank","sides":0,"color":"#1DBEE1","type":"default"},
+    {"name":"tank","sides":0,"color":"#3ca4cb","type":"default"},
     {"name":"godly","sides":3,"color":"#F15CE2","type":"ascend"},
     {"name":"strange","sides":7,"color":"#3A2BEA","type":"weird"}
   ],
