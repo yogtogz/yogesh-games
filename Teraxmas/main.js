@@ -196,7 +196,7 @@ o.pos[5] = moveY * actualSpeed;
         ctx.lineWidth = 1;
         ctx.strokeRect(o.pos[2], o.pos[3], o.pos[0], o.pos[1]);
       }
-    } elseif (o.library == "player") {
+    } else if (o.library == "player") {
       if (o.type == "tank") {
         ctx.fillStyle = o.optional[0];
         ctx.beginPath();
