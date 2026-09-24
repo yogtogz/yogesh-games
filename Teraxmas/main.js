@@ -197,7 +197,7 @@ let player = objects.find(o => o.tag === "player" && o.id === playerid);
   ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
   ctx.scale(camera.zoom, camera.zoom);
   ctx.translate(-camera.x, -camera.y);
-  let currentWorld = window.worlds && window.worlds[gamemode] ? window.worlds[gamemode] : { width: 2000, height: 2000 };
+  let currentWorld = worlds && worlds[gamemode] ? worlds[gamemode] : { width: 2000, height: 2000 };
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, currentWorld.width, currentWorld.height);
   ctx.strokeStyle = "#cccccc";
@@ -220,8 +220,8 @@ if (o.tag == "player" && o.id == playerid) {
 let actualSpeed = baseSpeed * (50 / diameter);
   o.pos[4] = Number(moveX * actualSpeed) || 0;
   o.pos[5] = Number(moveY * actualSpeed) || 0;
-  let currentWorld = window.worlds && window.worlds[gamemode] 
-    ? window.worlds[gamemode] 
+  let currentWorld = worlds && worlds[gamemode] 
+    ? worlds[gamemode] 
     : { "width": 50000, "height": 50000 };
   let nextX = o.pos[2] + o.pos[4];
   let nextY = o.pos[3] + o.pos[5];
