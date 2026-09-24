@@ -158,6 +158,9 @@ ctx.clearRect(0, 0, canvas.width, canvas.height);
       if (o.type == "block") {
         ctx.fillStyle = o.optional[0];
         ctx.fillRect(o.pos[2], o.pos[3], o.pos[0], o.pos[1]);
+        ctx.strokeStyle = borderColor(o.optional[0]);
+        ctx.lineWidth = 5;
+        ctx.strokeRect(o.pos[2], o.pos[3], o.pos[0], o.pos[1]);
       }
     }
     o.pos[2] += o.pos[4]
