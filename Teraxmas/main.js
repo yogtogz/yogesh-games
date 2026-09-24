@@ -153,7 +153,7 @@ function handleKeys() {
   keys[key.key] = true
   };
   document.onkeyup = function(key) {
-  keys[key.key] = true
+  keys[key.key] = false
   };
 }
 let lastTime = 0;
@@ -188,8 +188,8 @@ if (o.tag == "player" && o.id == playerid) {
       moveX /= length;
       moveY /= length;
   }
-  let diameter = (o.pos[0] + o.pos[1]) / 2; 
-  let actualSpeed = baseSpeed * (50 / diameter); 
+  let diameter = (o.pos[0] + o.pos[1]) / 2 || (o.optional[1] * 2) || 20; 
+let actualSpeed = baseSpeed * (50 / diameter);
   o.pos[4] = moveX * actualSpeed;
   o.pos[5] = moveY * actualSpeed;
 }
