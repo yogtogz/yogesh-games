@@ -118,7 +118,8 @@ function loadGame() {
 function idGen() {
   const char = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_"
   let result = ''
-  for (let i = 0; i < Math.random(4,24); i++) {
+  const length = Math.floor(Math.random() * (24 - 6 + 1)) + 6;
+  for (let i = 0; i < length; i++) {
         result += char.charAt(Math.floor(Math.random() * char.length));
     }
     return result;
@@ -136,7 +137,6 @@ function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, 
 }
 
 function renderGame(what) {
-  const canvas = document.getElementById("gamecanvas");
   alert("rendering game");
   let ui = document.getElementById("gamecanvas");
   if (what) {
@@ -144,7 +144,7 @@ function renderGame(what) {
   } else {
     ui.style.display = "none";
   }
-  playerid = summonObject("player","tank", 50, 50, 0, 0, 100, 10, 100, ["#00FFFF", 1], "player").id;
+  playerid = summonObject("player","tank", 0, 0, (window.innerWidth/2)-5, (window.innerHeight/2)-5, 0, 0, 100, 100, 100, ["#00FFFF", 10], "player").id;
   return true;
 }
 
@@ -160,8 +160,14 @@ let lastTime = 0;
 // W w3schools for the tutorial stuff
 function renderCanvas() {
   
-  const canvas = document.getElementById("gamecanvas");
+   const canvas = document.getElementById("gamecanvas");
   const ctx = canvas.getContext("2d");
+  canvas.style.width = window.innerWidth + "px";
+  canvas.style.height = window.innerHeight + "px";
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+  ctx.scale(dpr, dpr);
 
 ctx.setTransform(1, 0, 0, 1, 0, 0); 
 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -200,7 +206,7 @@ o.pos[5] = moveY * actualSpeed;
       if (o.type == "tank") {
         ctx.fillStyle = o.optional[0];
         ctx.beginPath();
-        ctx.arc(o.pos[2], o.pos[3], o.optional[1] || (o.pos[2] / o.pos[3]), 0, 2 * Math.PI);
+        ctx.arc(o.pos[2], o.pos[3], o.optional[1] || ((o.pos[0] / o.pos[1]) * 10), 0, 2 * Math.PI);
         ctx.fill();
         ctx.strokeStyle = borderColor(o.optional[0]);
         ctx.lineWidth = 1;
