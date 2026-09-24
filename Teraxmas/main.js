@@ -1,5 +1,8 @@
 alert("Made without AI.")
+let baseSpeed = 3; // Base player speed
 let gamemode = "ffa"
+let playerid = "player_object_id_here"
+const keys = {"a":true,"b":false,"c":false,"d":false,"e":false,"f":false,"g":false,"h":false,"i":false,"j":false,"k":false,"l":false,"m":false,"n":false,"o":false,"p":false,"q":false,"r":false,"s":false,"t":false,"u":false,"v":false,"w":false,"x":false,"y":false,"z":false,"0":false,"1":false,"2":false,"3":false,"4":false,"5":false,"6":false,"7":false,"8":false,"9":false,"enter":false,"escape":false,"space":false,"backspace":false,"shift":false,"control":false,"alt":false,"arrowup":false,"arrowdown":false,"arrowleft":false,"arrowright":false,"minus":false,"equal":false,"bracketleft":false,"bracketright":false,"backslash":false,"semicolon":false,"quote":false,"comma":false,"period":false,"slash":false,"backquote":false};
 // Libraries: Shape Player Misc Test
 // Test: Block Circle
 // Test: Include pos:[width and height and x and y and other stuff]
@@ -11,8 +14,8 @@ let gamemode = "ffa"
 // Musc: scale,x,y,shape,damage,vx,vy (v = velocity)
 
 // HOW TO USE pos
-// id,library,type,[width, height, x, y, vx, vy],xp,damage,optional:[color:default/hex]
-// "id": id, "library": lib, "type": ty, "pos": [w,h,x,y,vx,vy], "exp": xp, "damage": dmg, "optional": opt
+// id,library,type,[width, height, x, y, vx, vy],xp,damage,optional:[color default/hex, radius number for a circle or tank)], tag
+// "id": id, "library": lib, "type": ty, "pos": [w,h,x,y,vx,vy], "exp": xp, "damage": dmg, "hp":hp, "optional": opt, "tag":tag
 let objects = [
   {"id":"test_id","library":"test", "type":"block", "pos":[50,50,0,0,0,0], "optional":["blue"]}
 ]
@@ -108,16 +111,7 @@ function loadGame() {
   alert("loading game");
   return true;
 }
-function renderGame(what) {
-  alert("rendering game");
-  let ui = document.getElementById("gamecanvas");
-  if (what) {
-    ui.style.display = "block";
-  } else {
-    ui.style.display = "none";
-  }
-  return true;
-}
+
 
 // MAIN GAME
 
@@ -130,17 +124,38 @@ function idGen() {
     return result;
 }
 
-function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, xp=0, dmg=0,opt=["default"], id=idGen()) {
+function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, xp=0, dmg=0, hp=100, opt=["default", null], tag=null,id=idGen()) {
   while (objects.some(it => it.id === id)) {
     id = idGen();
   }
   let obj = {
-    "id": id, "library": lib, "type": ty, "pos": [w,h,x,y,vx,vy], "exp": xp, "damage": dmg, "optional": opt
+    "id": id, "library": lib, "type": ty, "pos": [w,h,x,y,vx,vy], "exp": xp, "damage": dmg, "hp":hp, "optional": opt, "tag":tag
   };
   objects.push(obj);
   return obj;
 }
 
+function renderGame(what) {
+  const canvas = document.getElementById("gamecanvas");
+  alert("rendering game");
+  let ui = document.getElementById("gamecanvas");
+  if (what) {
+    ui.style.display = "block";
+  } else {
+    ui.style.display = "none";
+  }
+  playerid = summonObject("player","tank", 50, 50, 0, 0, 100, 10, 100, ["#00FFFF", 1], "player").id;
+  return true;
+}
+
+function handleKeys() {
+  document.onkeydown = function(key) {
+  keys[key.key] = true
+  };
+  document.onkeyup = function(key) {
+  keys[key.key] = true
+  };
+}
 let lastTime = 0;
 // W w3schools for the tutorial stuff
 function renderCanvas() {
@@ -154,18 +169,48 @@ ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "white";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   objects.forEach(o => {
+    if (o.tag == "player" && o.id == playerid) {
+      // I said no AI but like... Math? Me, A Dummy? In Javascript? Robot Time.
+let moveX = 0;
+let moveY = 0;
+if (keys["d"]) moveX += 1;
+if (keys["a"]) moveX -= 1;
+if (keys["s"]) moveY += 1;
+if (keys["w"]) moveY -= 1;
+let length = Math.sqrt(moveX * moveX + moveY * moveY);
+if (length > 0) {
+    moveX /= length;
+    moveY /= length;
+}
+let diameter = (o.width + o.height) / 2;
+let actualSpeed = baseSpeed * (50 / diameter); 
+o.pos[4] = moveX * actualSpeed;
+o.pos[5] = moveY * actualSpeed;
+    }
+    
     if (o.library == "test") {
       if (o.type == "block") {
         ctx.fillStyle = o.optional[0];
         ctx.fillRect(o.pos[2], o.pos[3], o.pos[0], o.pos[1]);
         ctx.strokeStyle = borderColor(o.optional[0]);
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 1;
         ctx.strokeRect(o.pos[2], o.pos[3], o.pos[0], o.pos[1]);
+      }
+    } elseif (o.library == "player") {
+      if (o.type == "tank") {
+        ctx.fillStyle = o.optional[0];
+        ctx.beginPath();
+        ctx.arc(o.pos[2], o.pos[3], o.optional[1] || (o.pos[2] / o.pos[3]), 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.strokeStyle = borderColor(o.optional[0]);
+        ctx.lineWidth = 1;
+        ctx.stroke();
       }
     }
     o.pos[2] += o.pos[4]
     o.pos[3] += o.pos[5]
   });
+  handleKeys(); // Handle key presses
 }
 function loop(currentTime) {
   requestAnimationFrame(loop);
