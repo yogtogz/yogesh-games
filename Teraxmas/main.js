@@ -51,8 +51,8 @@ async function definitionJsonLoader(what) {
 async function registerJsonVariables() {
   window.entity = await definitionJsonLoader("entity");
   window.worlds = await definitionJsonLoader("worlds");
+  return true;
 }
-registerJsonVariables();
 // yes sorry guys I decided to... It's just one function
 function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
     const hexToRgb = (hex) => {
@@ -91,8 +91,10 @@ async function play() {
     loadingScreen(false);
     menu(true);
     alert('unable to start playing :(')
-    const reload = prompt("Reload page? (May fix error, if it does not, it's probably being fixed right now.)")
+    const reload = confirm("Reload page? (May fix error, if it does not, it's probably being fixed right now.)")
     if (!reload) alert("Too bad you gotta reload.");
+    const devkey = prompt("Enter skip reload key to continue (Not reccomended, non devs.)", "Yes please don't read the source code.");
+    if (devkey != "banana") window.location.reload();
     window.location.reload()
   }
 }
@@ -150,7 +152,7 @@ function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, 
   return obj;
 }
 
-function renderGame(what) {
+async function renderGame(what) {
   alert("rendering game");
   let ui = document.getElementById("gamecanvas");
   if (what) {
@@ -162,7 +164,21 @@ function renderGame(what) {
     ? window.entity.player.tank.color 
     : "#3ca4cb";
   playerid = summonObject("player","tank", 0, 0, (window.innerWidth/2)-5, (window.innerHeight/2)-5, 0, 0, 100, 100, 100, [tankColor, 10], "player").id;
-  return true;
+  // AWAITALL
+  const json = await registerJsonVariables();
+  const work = json && true // replace true with other stuff
+  if (work) {
+    requestAnimationFrame(loop);
+    handleKeys(); // Handle key presses
+    return true;
+  } else {
+    alert("Game did not successfully load. Please reload or something.")
+    const reloadit = confirm("Reload?")
+    if (! reloadit) alert("too bad you need to reload.");
+    const devkey = prompt("Enter skip reload key to continue (Not reccomended, non devs.)", "Yes please don't read the source code.");
+    if (devkey != "banana") window.location.reload();
+    return false;
+  }
 }
 
 function handleKeys() {
@@ -265,8 +281,6 @@ function loop(currentTime) {
 
   renderCanvas();
 }
-requestAnimationFrame(loop);
-handleKeys(); // Handle key presses
 
 window.onwheel = function(event) {
   if (event.deltaY > 0) {
