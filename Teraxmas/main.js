@@ -5,7 +5,8 @@ let playerid = "player_object_id_here"
 const keys = {"a":false,"b":false,"c":false,"d":false,"e":false,"f":false,"g":false,"h":false,"i":false,"j":false,"k":false,"l":false,"m":false,"n":false,"o":false,"p":false,"q":false,"r":false,"s":false,"t":false,"u":false,"v":false,"w":false,"x":false,"y":false,"z":false,"0":false,"1":false,"2":false,"3":false,"4":false,"5":false,"6":false,"7":false,"8":false,"9":false,"enter":false,"escape":false,"space":false,"backspace":false,"shift":false,"control":false,"alt":false,"arrowup":false,"arrowdown":false,"arrowleft":false,"arrowright":false,"minus":false,"equal":false,"bracketleft":false,"bracketright":false,"backslash":false,"semicolon":false,"quote":false,"comma":false,"period":false,"slash":false,"backquote":false};
 const camera = {
   x: 0,
-  y: 0
+  y: 0,
+  zoom:1.5
 };
 // Libraries: Shape Player Misc Test
 // Test: Block Circle
@@ -156,7 +157,10 @@ function renderGame(what) {
   } else {
     ui.style.display = "none";
   }
-  playerid = summonObject("player","tank", 0, 0, (window.innerWidth/2)-5, (window.innerHeight/2)-5, 0, 0, 100, 100, 100, [entity.player.tank.color, 10], "player").id;
+  let tankColor = (window.entity && window.entity.player && window.entity.player.tank)
+    ? window.entity.player.tank.color 
+    : "#3ca4cb";
+  playerid = summonObject("player","tank", 0, 0, (window.innerWidth/2)-5, (window.innerHeight/2)-5, 0, 0, 100, 100, 100, [tankColor, 10], "player").id;
   return true;
 }
 
@@ -265,8 +269,9 @@ handleKeys(); // Handle key presses
 
 window.onwheel = function(event) {
   if (event.deltaY > 0) {
-    globalZoom = Math.max(0.5, globalZoom - 0.1)
+    camera.zoom = Math.max(0.5, camera.zoom - 0.1);
   } else {
-    globalZoom = Math.min(5.0, globalZoom + 0.1);
+    camera.zoom = Math.min(5.0, camera.zoom + 0.1);
   }
 };
+
