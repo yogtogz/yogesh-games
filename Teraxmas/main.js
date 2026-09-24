@@ -190,8 +190,8 @@ if (o.tag == "player" && o.id == playerid) {
   }
   let diameter = (o.pos[0] + o.pos[1]) / 2 || (o.optional[1] * 2) || 20; 
 let actualSpeed = baseSpeed * (50 / diameter);
-  o.pos[4] = moveX * actualSpeed;
-  o.pos[5] = moveY * actualSpeed;
+  o.pos[4] = Number(moveX * actualSpeed) || 0;
+  o.pos[5] = Number(moveY * actualSpeed) || 0;
 }
 
     
@@ -217,7 +217,7 @@ let actualSpeed = baseSpeed * (50 / diameter);
     o.pos[2] += o.pos[4]
     o.pos[3] += o.pos[5]
   });
-  handleKeys(); // Handle key presses
+  
 }
 function loop(currentTime) {
   requestAnimationFrame(loop);
@@ -229,3 +229,4 @@ function loop(currentTime) {
 }
 
 requestAnimationFrame(loop);
+handleKeys(); // Handle key presses
