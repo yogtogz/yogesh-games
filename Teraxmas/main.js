@@ -47,8 +47,10 @@ async function definitionJsonLoader(what) {
     return err;
   }
 }
-window.entity = definitionJsonLoader("entity");
-window.worlds = definitionJsonLoader("worlds");
+async function registerJsonVariables() {
+  window.entity = await definitionJsonLoader("entity");
+  window.worlds = await definitionJsonLoader("worlds");
+}
 // yes sorry guys I decided to... It's just one function
 function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
     const hexToRgb = (hex) => {
