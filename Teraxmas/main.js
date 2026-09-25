@@ -237,8 +237,7 @@ let player = objects.find(o => o.tag === "player" && o.id === playerid);
     ctx.lineTo(currentWorld.width, y);
     ctx.stroke();
   }
-for (let i_am_counting_for_loop_bro = objects.length - 1; i_am_counting_for_loop_bro >= 0; i_am_counting_for_loop_bro--) {
-    const o = objects[i_am_counting_for_loop_bro];
+objects.forEach(o => {
     if (o.tag == "player" && o.id == playerid) {
   let moveX = 0;
   let moveY = 0;
@@ -288,7 +287,7 @@ let actualSpeed = baseSpeed * (50 / diameter);
     }
     o.pos[2] += o.pos[4]
     o.pos[3] += o.pos[5]
-}
+})
   ctx.restore();
 }
 function loop(currentTime) {
