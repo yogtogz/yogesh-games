@@ -238,7 +238,7 @@ let player = objects.find(o => o.tag === "player" && o.id === playerid);
     ctx.stroke();
   }
 for (let i_am_counting_for_loop_bro = objects.length - 1; i_am_counting_for_loop_bro >= 0; i_am_counting_for_loop_bro--) {
-    const o = objects[i];
+    const o = objects[i_am_counting_for_loop_bro];
     if (o.tag == "player" && o.id == playerid) {
   let moveX = 0;
   let moveY = 0;
