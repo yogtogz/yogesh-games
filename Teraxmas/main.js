@@ -19,10 +19,11 @@ const camera = {
 // Musc: scale,x,y,shape,damage,vx,vy (v = velocity)
 
 // HOW TO USE pos
-// id,library,type,[width, height, x, y, vx, vy],xp,damage,optional:[color default/hex, radius number for a circle or tank)], tag
+// id,library,type,[width, height, x, y, vx, vy],xp,damage,optional:opt], tag
 // "id": id, "library": lib, "type": ty, "pos": [w,h,x,y,vx,vy], "exp": xp, "damage": dmg, "hp":hp, "optional": opt, "tag":tag
+// opt: [color/hex, radius for circle/tank, collide:[canCollide,CollisionBlockOrCircleOrSomething]]
 let objects = [
-  {"id":"test_id","library":"test", "type":"block", "pos":[50,50,0,0,0,0], "optional":["blue"]}
+  {"id":"test_id","library":"test", "type":"block", "pos":[50,50,10,10,0,0], "optional":["blue",null,[true,"block"]]}
 ]
 async function definitionJsonLoader(what) { 
   try {
@@ -127,7 +128,79 @@ function loadGame() {
   alert("loading game");
   return true;
 }
+// AI math. I'm dumber.
+// Checks if a specific object (obj1) is touching any valid colliders in the game world
+function isTouchingAnything(obj1) {
+  // Check if obj1 itself has collisions turned off via optional[2][0]
+  if (obj1.optional && Array.isArray(obj1.optional[2]) && obj1.optional[2][0] === false) {
+    return false;
+  }
 
+  // Helper to determine shape type based on optional[2][1] or defaults
+  const getShapeType = (obj) => {
+    if (obj.optional && Array.isArray(obj.optional[2]) && obj.optional[2][1]) {
+      return obj.optional[2][1].toLowerCase(); // "circle" or "block"
+    }
+    if (obj.library === "player" || obj.type === "circle" || obj.type === "tank") {
+      return "circle";
+    }
+    return "block";
+  };
+
+  const type1 = getShapeType(obj1);
+
+  // Loop through all game objects
+  for (let obj2 of objects) {
+    // Don't check an object against itself
+    if (obj1.id === obj2.id) continue;
+
+    // Skip if target object has disabled collisions via optional[2][0]
+    if (obj2.optional && Array.isArray(obj2.optional[2]) && obj2.optional[2][0] === false) {
+      continue;
+    }
+
+    const type2 = getShapeType(obj2);
+    const isObj1Circle = (type1 === "circle");
+    const isObj2Circle = (type2 === "circle");
+
+    let colliding = false;
+
+    if (isObj1Circle && isObj2Circle) {
+      // Circle vs Circle
+      const r1 = obj1.optional[1] || 10;
+      const r2 = obj2.optional[1] || 10;
+      const dx = obj1.pos[2] - obj2.pos[2];
+      const dy = obj1.pos[3] - obj2.pos[3];
+      colliding = Math.sqrt(dx * dx + dy * dy) < (r1 + r2);
+    } else if (!isObj1Circle && !isObj2Circle) {
+      // Block vs Block (Rect vs Rect)
+      colliding = (
+        obj1.pos[2] < obj2.pos[2] + obj2.pos[0] &&
+        obj1.pos[2] + obj1.pos[0] > obj2.pos[2] &&
+        obj1.pos[3] < obj2.pos[3] + obj2.pos[1] &&
+        obj1.pos[3] + obj1.pos[1] > obj2.pos[3]
+      );
+    } else {
+      // Circle vs Block (Mixed)
+      const circle = isObj1Circle ? obj1 : obj2;
+      const rect = isObj1Circle ? obj2 : obj1;
+      const radius = circle.optional[1] || 10;
+
+      const closestX = Math.max(rect.pos[2], Math.min(circle.pos[2], rect.pos[2] + rect.pos[0]));
+      const closestY = Math.max(rect.pos[3], Math.min(circle.pos[3], rect.pos[3] + rect.pos[1]));
+
+      const dx = circle.pos[2] - closestX;
+      const dy = circle.pos[3] - closestY;
+      colliding = (dx * dx + dy * dy) < (radius * radius);
+    }
+
+    if (colliding) {
+      return true; // Stop immediately on first collision
+    }
+  }
+
+  return false; // Path is clear!
+}
 
 // MAIN GAME
 
@@ -141,7 +214,7 @@ function idGen() {
     return result;
 }
 
-function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, xp=0, dmg=0, hp=100, opt=["default", null], tag=null,id=idGen()) {
+function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, xp=0, dmg=0, hp=100, opt=["default", null,[false,"block"]], tag=null,id=idGen()) {
   while (objects.some(it => it.id === id)) {
     id = idGen();
   }
@@ -166,6 +239,7 @@ async function renderGame(what) {
   if (work) {
     requestAnimationFrame(loop);
     handleKeys(); // Handle key presses
+    ui.style.display = "block";
     return true;
   } else {
     alert("Game did not successfully load. Please reload or something.")
@@ -173,7 +247,6 @@ async function renderGame(what) {
     if (! reloadit) alert("too bad you need to reload.");
     const devkey = prompt("Enter skip reload key to continue (Not reccomended, non devs.)", "Yes please don't read the source code.");
     if (devkey != "banana") window.location.reload();
-    ui.style.display = "block";
     return false;
   }
     } else {
@@ -223,7 +296,7 @@ let player = objects.find(o => o.tag === "player" && o.id === playerid);
   // grid would be nice
   ctx.strokeStyle = "#e5e5e5";
   ctx.lineWidth = 1;
-  let gridSize = 5;
+  let gridSize = 20;
   // Wow, this code appeared out of nowhere!
   for (let x = 0; x <= currentWorld.width; x += gridSize) {
     ctx.beginPath();
@@ -259,13 +332,21 @@ let actualSpeed = baseSpeed * (50 / diameter);
     : { "width": 50000, "height": 50000 };
   let nextX = o.pos[2] + o.pos[4];
   let nextY = o.pos[3] + o.pos[5];
+  let futurePlayer = { 
+        ...o, 
+        pos: [o.pos[0], o.pos[1], nextX, nextY, o.pos[4], o.pos[5]] 
+      };
+      if (isTouchingAnything(futurePlayer)) {
+        o.pos[4] = 0;
+        o.pos[5] = 0;
+        nextX = o.pos[2];
+        nextY = o.pos[3];
+      }
   if (nextX < 0) { o.pos[4] = 0; o.pos[2] = 0; }
   if (nextX > currentWorld.width) { o.pos[4] = 0; o.pos[2] = currentWorld.width; }
   if (nextY < 0) { o.pos[5] = 0; o.pos[3] = 0; }
   if (nextY > currentWorld.height) { o.pos[5] = 0; o.pos[3] = currentWorld.height; }
 }
-
-    
     if (o.library == "test") {
       if (o.type == "block") {
         ctx.fillStyle = o.optional[0];
