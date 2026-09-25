@@ -1,5 +1,5 @@
 let worldData;
-let baseSpeed = 3; // Base player speed
+let baseSpeed = 1; // Base player speed
 let gamemode = "ffa"
 let playerid = "player_object_id_here"
 const keys = {"a":false,"b":false,"c":false,"d":false,"e":false,"f":false,"g":false,"h":false,"i":false,"j":false,"k":false,"l":false,"m":false,"n":false,"o":false,"p":false,"q":false,"r":false,"s":false,"t":false,"u":false,"v":false,"w":false,"x":false,"y":false,"z":false,"0":false,"1":false,"2":false,"3":false,"4":false,"5":false,"6":false,"7":false,"8":false,"9":false,"enter":false,"escape":false,"space":false,"backspace":false,"shift":false,"control":false,"alt":false,"arrowup":false,"arrowdown":false,"arrowleft":false,"arrowright":false,"minus":false,"equal":false,"bracketleft":false,"bracketright":false,"backslash":false,"semicolon":false,"quote":false,"comma":false,"period":false,"slash":false,"backquote":false};
@@ -21,7 +21,7 @@ const camera = {
 // HOW TO USE pos
 // id,library,type,[width, height, x, y, vx, vy],xp,damage,optional:opt], tag
 // "id": id, "library": lib, "type": ty, "pos": [w,h,x,y,vx,vy], "exp": xp, "damage": dmg, "hp":hp, "optional": opt, "tag":tag
-// opt: [color/hex, radius for circle/tank, collide:[canCollide,CollisionBlockOrCircleOrSomething]]
+// opt: [color/hex, radius for circle/tank, collide:[canCollide,BlockOrCircle]]
 let objects = [
   {"id":"test_id","library":"test", "type":"block", "pos":[50,50,10,10,0,0], "optional":["blue",null,[true,"block"]]}
 ]
@@ -141,7 +141,7 @@ function isTouchingAnything(obj1) {
     if (obj.optional && Array.isArray(obj.optional[2]) && obj.optional[2][1]) {
       return obj.optional[2][1].toLowerCase(); // "circle" or "block"
     }
-    if (obj.library === "player" || obj.type === "circle" || obj.type === "tank") {
+    if (obj.library === "player" || obj.type === "circle") {
       return "circle";
     }
     return "block";
