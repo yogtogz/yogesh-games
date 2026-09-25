@@ -223,7 +223,7 @@ let player = objects.find(o => o.tag === "player" && o.id === playerid);
   // grid would be nice
   ctx.strokeStyle = "#e5e5e5";
   ctx.lineWidth = 1;
-  let gridSize = 50;
+  let gridSize = 5;
   // Wow, this code appeared out of nowhere!
   for (let x = 0; x <= currentWorld.width; x += gridSize) {
     ctx.beginPath();
