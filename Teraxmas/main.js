@@ -156,16 +156,12 @@ async function renderGame(what) {
   alert("rendering game");
   let ui = document.getElementById("gamecanvas");
   if (what) {
-    ui.style.display = "block";
-  } else {
-    ui.style.display = "none";
-  }
+    const json = await registerJsonVariables();
   let tankColor = (window.entity && window.entity.player && window.entity.player.tank)
     ? window.entity.player.tank.color 
     : "#3ca4cb";
   playerid = summonObject("player","tank", 0, 0, Math.random(0,worlds[gamemode].width), Math.random(0,worlds[gamemode].height), 0, 0, 100, 100, 100, [tankColor, 10], "player").id;
   // AWAITALL
-  const json = await registerJsonVariables();
   const work = json && true // replace true with other stuff
   if (work) {
     requestAnimationFrame(loop);
@@ -177,7 +173,11 @@ async function renderGame(what) {
     if (! reloadit) alert("too bad you need to reload.");
     const devkey = prompt("Enter skip reload key to continue (Not reccomended, non devs.)", "Yes please don't read the source code.");
     if (devkey != "banana") window.location.reload();
+    ui.style.display = "block";
     return false;
+  }
+    } else {
+    ui.style.display = "none";
   }
 }
 
