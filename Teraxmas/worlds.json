@@ -2,6 +2,7 @@
   "ffa": {
     "width":20000,
     "height":20000,
-    "playersizeincrease":110
+    "playersizeincrease":110,
+    "server": "wss://teraxmas-backend.onrender.com"
   }
 }
