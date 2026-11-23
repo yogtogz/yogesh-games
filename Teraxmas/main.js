@@ -120,7 +120,11 @@ async function connect() {
   socket.addEventListener('message', handleMessage);
   socket.addEventListener('error', handleError);
   socket.addEventListener('close', handleClose);
-  return true;
+  return new Promise((resolve) => {
+  if (window.socket.readyState === 1) return resolve(true);
+  window.socket.addEventListener("open", () => resolve(true), { once: true });
+});
+
 }
 //const color = "#e8c764";
 //const border = borderColor(color);
