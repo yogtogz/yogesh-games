@@ -57,12 +57,16 @@ async function registerJsonVariables() {
 }
 async function loadServers() {
   await registerJsonVariables();
-  Object.entries(worlds).forEach( async ([id, values]) => {
+  const once = (target, event) => new Promise((resolve) => {
+    target.addEventListener(event, resolve, { once: true });
+  });
+  for (const [id, values] of Object.entries(worlds)) {
     let classes = 'choose'
     if (id == gamemode) classes = 'choose choosen'
-    const server = Object.assign(new URL(values.server), { search: new URLSearchParams([...new URL(values.server).searchParams, ["type", "ping"]]) }).href
-    console.log(server)
-    pingsocket = new WebSocket(server)
+    const url = new URL(values.server);
+    url.searchParams.set('type', 'ping');
+    console.log(url.href);
+    const pingsocket = new WebSocket(url.href)
     pingsocket.addEventListener("message", (event) => {
       const parsedData = JSON.parse(event.data);
       if (parsedData.type == 'ping') {
@@ -72,8 +76,8 @@ async function loadServers() {
         pingsocket.close();
       }
     }, { once: true });
-    await once(socket, 'close');
-  });
+    await once(pingsocket, 'close');
+  };
 }
 loadServers()
 // yes sorry guys I decided to... It's just one function
