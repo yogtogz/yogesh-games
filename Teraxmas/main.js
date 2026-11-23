@@ -77,23 +77,27 @@ function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 // CONNECTION FUNCTION
-// I was miraculously able to do a good portion of this myself, wow!
+// I was miraculously able to do a good portion of this myself, wow! (backend, i was able to do half)
 // data: {type, data}
 // state_variable: {type: 'state_variable', data:{'The Entire state variable': 'is here'}
+
+// robot
 function packet(data = {}) {
-  if (data.type === 'state_variable') {
+  if (data.type == 'open') {}
+
+  if (data.type == 'state_variable') {
     const serverObjects = data.data.objects;
 
     serverObjects.forEach((serverObj) => {
       const existingObj = objects.find((obj) => obj.id === serverObj.id);
 
       if (existingObj) {
-        if (serverObj.id === myId) {
-          // Keep your local pos[2..5] (x, y, vx, vy) so velocity/movement isn't wiped
-          existingObj.pos[0] = serverObj.pos[0]; // width
-          existingObj.pos[1] = serverObj.pos[1]; // height
+        if (serverObj.id === playerid) {
+          // Keep your local x, y, vx, vy (pos[2..5]) so movement isn't overwritten
+          existingObj.pos = serverObj.pos; // width
+          existingObj.pos = serverObj.pos; // height
 
-          // Update non-position stats from server
+          // Sync server-controlled stats
           existingObj.exp = serverObj.exp;
           existingObj.damage = serverObj.damage;
           existingObj.hp = serverObj.hp;
@@ -112,11 +116,12 @@ function packet(data = {}) {
     );
   }
 }
-
+// self
 function send(type, data) {
   if (!socket || socket.readyState !== 1) return;
   socket.send(JSON.stringify({ type, data }))
 }
+// tutorial
 async function connect() {
   window.socket = new WebSocket(server);
    const handleOpen = (event) => {
