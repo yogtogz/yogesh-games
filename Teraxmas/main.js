@@ -252,10 +252,18 @@ function isTouchingAnything(obj1) {
 }
 
 // MAIN GAME
-function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, xp=0, dmg=0, hp=100, opt=["default", null,[false,"block"]], tag=null,id) {
+function idGen() {
+  const char = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_"
+  let result = ''
+  const length = Math.floor(Math.random() * (24 - 6 + 1)) + 6;
+  for (let i = 0; i < length; i++) {
+        result += char.charAt(Math.floor(Math.random() * char.length));
+    }
+    return result;
+}
+function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, xp=0, dmg=0, hp=100, opt=["default", null,[false,"block"]], tag=null,id=idGen()) {
   if (lib == "player") send('player_new', [lib, ty, w, h, x, y, vx, vy, xp, dmg, hp, opt, tag, id])
 }
-
 async function renderGame(what) {
   alert("rendering game");
   let ui = document.getElementById("gamecanvas");
@@ -263,7 +271,8 @@ async function renderGame(what) {
   let tankColor = (window.entity && window.entity.player && window.entity.player.tank)
     ? window.entity.player.tank.color 
     : "#3ca4cb";
-  playerid = summonObject("player","tank", 0, 0, Math.random(0,worlds[gamemode].width), Math.random(0,worlds[gamemode].height), 0, 0, 100, 100, 100, [tankColor, 10], "player").id;
+    playerid = idGen()
+    summonObject("player","tank", 0, 0, Math.random(0,worlds[gamemode].width), Math.random(0,worlds[gamemode].height), 0, 0, 100, 100, 100, [tankColor, 10], "player", playerid)
     requestAnimationFrame(loop);
     handleKeys(); // Handle key presses
     ui.style.display = "block";
