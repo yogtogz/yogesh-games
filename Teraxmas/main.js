@@ -55,6 +55,26 @@ async function registerJsonVariables() {
   window.worlds = await definitionJsonLoader("worlds");
   return true;
 }
+async function loadServers() {
+  await registerJsonVariables();
+  Object.entries(worlds).forEach(([id, values]) => {
+    let classes = 'choose'
+    if (id == gamemode) classes = 'choose choosen'
+    const server = Object.assign(new URL(values.server), { search: new URLSearchParams([...new URL(values.server).searchParams, ["type", "ping"]]) }).href
+    console.log(server)
+    pingsocket = new WebSocket(server)
+    pingsocket.addEventListener("message", (event) => 
+      const parsedData = JSON.parse(event.data);
+      if (parsedData.type == 'ping') {
+        document.getElementById('gamelist').insertAdjacentHTML('beforeend', `<button class="${classes}" id="${id}" onclick="setgamemode('${id}')">${values.label} <span class="counttext">${parsedData.online}</span>/<span class="counttext">${parsedData.max}</span></button>`);
+      }
+      if (pingsocket.readyState === WebSocket.OPEN) {
+        pingsocket.close();
+      }
+    }, { once: true });
+    await once(socket, 'close');
+  });
+}
 // yes sorry guys I decided to... It's just one function
 function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
     const hexToRgb = (hex) => {
@@ -171,7 +191,6 @@ async function connect() {
 async function play() {
   loadingScreen(true);
   menu(false);
-  await registerJsonVariables();
   window.server = worlds.ffa.server
   const loaded = await connect();
   if (loaded) {
