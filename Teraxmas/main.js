@@ -69,9 +69,8 @@ async function loadServers() {
     const pingsocket = new WebSocket(url.href)
     pingsocket.addEventListener("message", (event) => {
       const parsedData = JSON.parse(event.data);
-      console.log(parsedData)
       if (parsedData.type == 'ping') {
-        document.getElementById('gamelist').insertAdjacentHTML('beforeend', `<button class="${classes}" id="${id}" onclick="setgamemode('${id}')">${values.label} <span class="counttext">${parsedData.online}</span>/<span class="counttext">${parsedData.max}</span></button>`);
+        document.getElementById('gamelist').insertAdjacentHTML('beforeend', `<button class="${classes}" id="${id}" onclick="setgamemode('${id}')">${values.label} <span class="counttext">${parsedData.data.online}</span>/<span class="counttext">${parsedData.data.max}</span></button>`);
       }
       if (pingsocket.readyState === WebSocket.OPEN) {
         pingsocket.close();
