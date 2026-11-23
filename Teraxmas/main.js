@@ -178,6 +178,7 @@ async function connect() {
     socket.removeEventListener('message', handleMessage);
     socket.removeEventListener('error', handleError);
     socket.removeEventListener('close', handleClose);
+    clearInterval(stateInterval)
   };
 
   socket.addEventListener('open', handleOpen);
@@ -185,8 +186,8 @@ async function connect() {
   socket.addEventListener('error', handleError);
   socket.addEventListener('close', handleClose);
   window.stateInterval = setInterval(() => {
-  packet('send', {})
-    send('move', {"x": moveX, "y": moveY})
+  packet('state', {})
+    if (moveX != 0 && moveY != 0) send('move', {"x": moveX, "y": moveY})
 }, 50);
   return new Promise((resolve) => {
   if (window.socket.readyState === 1) return resolve(true);
