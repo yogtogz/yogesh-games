@@ -234,8 +234,8 @@ async function play() {
   window.server = worlds.ffa.server
   const loaded = await connect();
   if (loaded) {
-  await loadingScreen(false);
   await renderGame(true);
+  await loadingScreen(false);
   alert('started playing')
   } else {
     alert('unable to start playing :(')
