@@ -81,19 +81,6 @@ async function loadServers() {
   };
 }
 loadServers()
-
-let hasLeft = false;
-function handleLeave() {
-  if (hasLeft) return;
-  hasLeft = true;
-  send('leave', player);
-}
-window.addEventListener('beforeunload', handleLeave);
-window.addEventListener('pagehide', (event) => {
-  if (!event.persisted) {
-    handleLeave();
-  }
-});
 // yes sorry guys I decided to... It's just one function
 function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
     const hexToRgb = (hex) => {
@@ -160,6 +147,19 @@ function send(type, data) {
   if (!socket || socket.readyState !== 1) return;
   socket.send(JSON.stringify({ type, data }))
 }
+// a bit robot but mostly self
+let hasLeft = false;
+function handleLeave() {
+  if (hasLeft) return;
+  hasLeft = true;
+  send('leave', player);
+}
+window.addEventListener('beforeunload', handleLeave);
+window.addEventListener('pagehide', (event) => {
+  if (!event.persisted) {
+    handleLeave();
+  }
+});
 // tutorial
 async function connect() {
   window.socket = new WebSocket(server);
