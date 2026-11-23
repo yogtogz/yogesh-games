@@ -93,7 +93,7 @@ function send(type, data) {
   if (!socket) return;
   socket.send(JSON.stringify({ type, data }))
 }
-function connect() {
+async function connect() {
   window.socket = new WebSocket(server + ":" + port);
    const handleOpen = (event) => {
     console.log('Connected to WSS server');
@@ -121,8 +121,8 @@ function connect() {
   socket.addEventListener('message', handleMessage);
   socket.addEventListener('error', handleError);
   socket.addEventListener('close', handleClose);
-
-  return true;
+  const loadedwebsocket = await ws && ws.readyState === socket.OPEN
+  return loadedwebsocket;
 }
 //const color = "#e8c764";
 //const border = borderColor(color);
@@ -133,8 +133,7 @@ async function play() {
   menu(false);
   await registerJsonVariables();
   window.server = worlds.ffa.server
-  connect();
-  const loaded = await ws && ws.readyState === WebSocket.OPEN
+  const loaded = await connect();
   if (loaded == true) {
   await loadingScreen(false);
   await renderGame(true);
