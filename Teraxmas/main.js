@@ -89,7 +89,7 @@ function packet(data = {}) {
   }
 }
 function send(type, data) {
-  if (!socket) return;
+  if (!socket || socket.readyState !== 1) return;
   socket.send(JSON.stringify({ type, data }))
 }
 async function connect() {
