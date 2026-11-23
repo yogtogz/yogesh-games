@@ -133,7 +133,8 @@ async function play() {
   menu(false);
   await registerJsonVariables();
   window.server = worlds.ffa.server
-  const loaded = await connect();
+  connect();
+  const loaded = await ws && ws.readyState === WebSocket.OPEN
   if (loaded == true) {
   await loadingScreen(false);
   await renderGame(true);
