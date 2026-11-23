@@ -120,7 +120,7 @@ async function connect() {
   socket.addEventListener('message', handleMessage);
   socket.addEventListener('error', handleError);
   socket.addEventListener('close', handleClose);
-  const loadedwebsocket = await socket && socket.readyState === WebSocket.OPEN
+  const loadedwebsocket = (await socket && socket.readyState === WebSocket.OPEN)
   return loadedwebsocket;
 }
 //const color = "#e8c764";
@@ -133,7 +133,7 @@ async function play() {
   await registerJsonVariables();
   window.server = worlds.ffa.server
   const loaded = await connect();
-  if (loaded == true) {
+  if (loaded) {
   await loadingScreen(false);
   await renderGame(true);
   alert('started playing')
