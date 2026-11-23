@@ -426,8 +426,8 @@ let actualSpeed = baseSpeed * (50 / diameter);
 function loop(currentTime) {
   requestAnimationFrame(loop);
 
-  const dt = (currentTime - lastTime) / 1000;
   lastTime = currentTime;
+  const dt = (currentTime - lastTime) / 1000;
 
   renderCanvas();
 }
