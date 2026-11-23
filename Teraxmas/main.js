@@ -388,30 +388,7 @@ objects.forEach(o => {
       moveX /= length;
       moveY /= length;
   }
-  let diameter = (o.pos[0] + o.pos[1]) / 2 || (o.optional[1] * 2) || 20; 
-let actualSpeed = baseSpeed * (50 / diameter);
-  o.pos[4] = Number(moveX * actualSpeed) || 0;
-  o.pos[5] = Number(moveY * actualSpeed) || 0;
-  let currentWorld = worlds && worlds[gamemode] 
-    ? worlds[gamemode] 
-    : { "width": 50000, "height": 50000 };
-  let nextX = o.pos[2] + o.pos[4];
-  let nextY = o.pos[3] + o.pos[5];
-  let futurePlayer = { 
-        ...o, 
-        pos: [o.pos[0], o.pos[1], nextX, nextY, o.pos[4], o.pos[5]] 
-      };
-      if (isTouchingAnything(futurePlayer)) {
-        o.pos[4] = 0;
-        o.pos[5] = 0;
-        nextX = o.pos[2];
-        nextY = o.pos[3];
-      }
-  if (nextX < 0) { o.pos[4] = 0; o.pos[2] = 0; }
-  if (nextX > currentWorld.width) { o.pos[4] = 0; o.pos[2] = currentWorld.width; }
-  if (nextY < 0) { o.pos[5] = 0; o.pos[3] = 0; }
-  if (nextY > currentWorld.height) { o.pos[5] = 0; o.pos[3] = currentWorld.height; }
-  send('replObj', [playerid, o])
+      send('move', {"x": moveX, "y": moveY})
 }
     if (o.library == "test") {
       if (o.type == "block") {
