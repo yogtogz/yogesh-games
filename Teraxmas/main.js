@@ -173,7 +173,7 @@ async function connect() {
   window.stateInterval = setInterval(() => {
   send('state', {})
     if (moveX !== 0 || moveY !== 0 || lastMoveX !== 0 || lastMoveY !== 0) {
-    send('move', { id: playerid, x: moveX, y: moveY });
+    send('move', { x: moveX, y: moveY, id: playerid, collide: true });
     lastMoveX = moveX;
     lastMoveY = moveY;
   }
