@@ -110,7 +110,8 @@ function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
 // data: {type, data}
 // state_variable: {type: 'state_variable', data:{'The Entire state variable': 'is here'}
 
-// robot
+// robot. I hate using robot bro I keep getting errors from it I would have probably done better myself
+// take this as a lesson, devtool lurkers.
 function packet(data) {
   if (!data || typeof data !== 'object') return;
 
@@ -123,10 +124,10 @@ function packet(data) {
 
       if (existingObj) {
         if (serverObj.id === playerid) {
-          // Only sync width & height from server; keep local x, y, vx, vy (pos[2..5])
-          existingObj.pos = serverObj.pos;
-          existingObj.pos = serverObj.pos;
-
+          // Only update width [0] and height; keep local x, y, vx, vy [5]
+          existingObj.pos[0] = serverObj.pos[0];
+          existingObj.pos[1] = serverObj.pos[1];
+      
           // Sync server-controlled stats
           existingObj.exp = serverObj.exp;
           existingObj.damage = serverObj.damage;
@@ -447,8 +448,8 @@ objects.forEach(o => {
       moveX /= length;
       moveY /= length;
   }
-      o.pos = moveX * baseSpeed;
-  o.pos = moveY * baseSpeed;
+  o.pos[4] = moveX;
+  o.pos[5] = moveY;
 }
     if (o.library == "test") {
       if (o.type == "block") {
