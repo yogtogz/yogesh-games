@@ -120,9 +120,7 @@ async function connect() {
   socket.addEventListener('message', handleMessage);
   socket.addEventListener('error', handleError);
   socket.addEventListener('close', handleClose);
-  alert(await socket);
-  const loadedwebsocket = socket && socket.readyState === WebSocket.OPEN;
-  return loadedwebsocket;
+  return true;
 }
 //const color = "#e8c764";
 //const border = borderColor(color);
