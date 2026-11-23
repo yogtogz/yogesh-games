@@ -81,7 +81,6 @@ function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
 // data: {type, data}
 // state_variable: {type: 'state_variable', data:{'The Entire state variable': 'is here'}
 function packet(data = {}) {
-  console.log(data)
   if (data.type == 'open') {}
   if (data.type == 'state_variable') {
     objects = data.data.objects
@@ -103,7 +102,7 @@ async function connect() {
   const handleMessage = (event) => {
     try {
     const parsedData = JSON.parse(event.data);
-      packet(event.data)
+      packet(parsedData)
   } catch (error) {
     console.error("handleMessage: ", error);
   }
