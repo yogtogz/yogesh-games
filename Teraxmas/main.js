@@ -81,9 +81,26 @@ function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
 // data: {type, data}
 // state_variable: {type: 'state_variable', data:{'The Entire state variable': 'is here'}
 function packet(data = {}) {
-  if (data.type == 'open') {}
-  if (data.type == 'state_variable') {
-    objects = data.data.objects
+  if (data.type === 'state_variable') {
+    const serverObjects = data.data.objects;
+
+    // 1. Update existing objects or add new ones
+    serverObjects.forEach((serverObj) => {
+      const existingObj = objects.find((obj) => obj.id === serverObj.id);
+
+      if (existingObj) {
+        // Update properties without destroying the object reference
+        Object.assign(existingObj, serverObj);
+      } else {
+        // Add new object if it doesn't exist yet
+        objects.push(serverObj);
+      }
+    });
+
+    // 2. Remove objects that the server deleted
+    objects = objects.filter((localObj) =>
+      serverObjects.some((serverObj) => serverObj.id === localObj.id)
+    );
   }
 }
 function send(type, data) {
