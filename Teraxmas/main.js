@@ -495,16 +495,16 @@ objects.forEach(o => {
   ctx.fillStyle = 'white';
   ctx.fillText(o.name, calcName.x, calcName.y);
       
-  const calcName = {"x": window.innerWidth / 2, "y": xploc.y + (xpsize.y / 2)}
+  const calcScore = {"x": window.innerWidth / 2, "y": xploc.y + (xpsize.y / 2)}
   ctx.font = 'Bold 24px Arial';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.strokeStyle = 'black';
   ctx.lineWidth = 6;
   ctx.lineJoin = 'round';
-  ctx.strokeText(scoreCalc(o.exp).level, calcName.x, calcName.y);
+  ctx.strokeText(scoreCalc(o.exp).level, calcScore.x, calcScore.y);
   ctx.fillStyle = 'white';
-  ctx.fillText(scoreCalc(o.exp).level, calcName.x, calcName.y);
+  ctx.fillText(scoreCalc(o.exp).level, calcScore.x, calcScore.y);
   ctx.beginPath();
   ctx.roundRect(xploc.x, xploc.y, scoreCalc(o.exp).score / xpsize.x, xpsize.y)
 }
