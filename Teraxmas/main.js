@@ -1,5 +1,4 @@
 window.socket = null;
-const port = 443
 let worldData;
 let baseSpeed = 1; // Base player speed
 let gamemode = "ffa"
@@ -94,7 +93,7 @@ function send(type, data) {
   socket.send(JSON.stringify({ type, data }))
 }
 async function connect() {
-  window.socket = new WebSocket(server + ":" + port);
+  window.socket = new WebSocket(server);
    const handleOpen = (event) => {
     console.log('Connected to WSS server');
     socket.send(JSON.stringify({ type: 'greeting', payload: 'Connected' }));
