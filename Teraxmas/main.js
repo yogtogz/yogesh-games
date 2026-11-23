@@ -56,7 +56,6 @@ async function registerJsonVariables() {
   window.worlds = await definitionJsonLoader("worlds");
   return true;
 }
-window.server = worlds.ffa.server
 // yes sorry guys I decided to... It's just one function
 function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
     const hexToRgb = (hex) => {
@@ -281,6 +280,7 @@ async function renderGame(what) {
   let ui = document.getElementById("gamecanvas");
   if (what) {
     const json = await registerJsonVariables();
+    window.server = worlds.ffa.server
   let tankColor = (window.entity && window.entity.player && window.entity.player.tank)
     ? window.entity.player.tank.color 
     : "#3ca4cb";
