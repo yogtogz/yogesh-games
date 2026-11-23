@@ -152,7 +152,7 @@ let hasLeft = false;
 function handleLeave() {
   if (hasLeft) return;
   hasLeft = true;
-  send('leave', player);
+  send('leave', playerid);
 }
 window.addEventListener('beforeunload', handleLeave);
 window.addEventListener('pagehide', (event) => {
