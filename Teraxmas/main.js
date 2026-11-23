@@ -81,6 +81,19 @@ async function loadServers() {
   };
 }
 loadServers()
+
+let hasLeft = false;
+function handleLeave() {
+  if (hasLeft) return;
+  hasLeft = true;
+  send('leave', player);
+}
+window.addEventListener('beforeunload', handleLeave);
+window.addEventListener('pagehide', (event) => {
+  if (!event.persisted) {
+    handleLeave();
+  }
+});
 // yes sorry guys I decided to... It's just one function
 function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
     const hexToRgb = (hex) => {
