@@ -75,6 +75,7 @@ async function loadServers() {
     await once(socket, 'close');
   });
 }
+loadServers()
 // yes sorry guys I decided to... It's just one function
 function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
     const hexToRgb = (hex) => {
@@ -229,6 +230,7 @@ function menu(what) {
   let ui = document.getElementById("menu");
   if (what) {
     ui.style.display = "block";
+    loadServers();
   } else {
     ui.style.display = "none";
   }
