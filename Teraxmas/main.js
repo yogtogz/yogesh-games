@@ -1,3 +1,6 @@
+window.server = 'localhost';
+window.socket = null;
+const port = 443
 let worldData;
 let baseSpeed = 1; // Base player speed
 let gamemode = "ffa"
@@ -75,6 +78,53 @@ function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
     const toHex = (c) => c.toString(16).padStart(2, '0');
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
+// CONNECTION FUNCTION
+// I was miraculously able to do a good portion of this myself, wow!
+// data: {type, data}
+// state_variable: {type: 'state_variable', data:{'The Entire state variable': 'is here'}
+function packet(data = {}) {
+  if (data.type == 'open') {
+    
+  }
+  if (data.type == 'state_variable') {
+    objects = data.data.objects
+  }
+}
+function send(type, data) {
+  socket.emit(type, data);
+}
+function connect(mode) {
+  alert(mode)
+  window.server = worlds[mode].server
+
+  window.socket = new WebSocket(server + ":" + port);
+   const handleOpen = (event) => {
+    console.log('Connected to WSS server');
+    socket.send(JSON.stringify({ type: 'greeting', payload: 'Connected' }));
+  };
+
+  const handleMessage = (event) => {
+    packet(event);
+  };
+
+  const handleError = (error) => {
+    console.error('WebSocket error:', error);
+  };
+
+  const handleClose = (event) => {
+    console.log(`Disconnected (Code: ${event.code})`);
+    
+    socket.removeEventListener('open', handleOpen);
+    socket.removeEventListener('message', handleMessage);
+    socket.removeEventListener('error', handleError);
+    socket.removeEventListener('close', handleClose);
+  };
+
+  socket.addEventListener('open', handleOpen);
+  socket.addEventListener('message', handleMessage);
+  socket.addEventListener('error', handleError);
+  socket.addEventListener('close', handleClose);
+}
 //const color = "#e8c764";
 //const border = borderColor(color);
 
@@ -86,6 +136,7 @@ async function play() {
   if (loaded == true) {
   await loadingScreen(false);
   await renderGame(true);
+  await connect(gamemode);
   alert('started playing')
   } else {
     alert('unable to start playing :(')
@@ -346,6 +397,7 @@ let actualSpeed = baseSpeed * (50 / diameter);
   if (nextX > currentWorld.width) { o.pos[4] = 0; o.pos[2] = currentWorld.width; }
   if (nextY < 0) { o.pos[5] = 0; o.pos[3] = 0; }
   if (nextY > currentWorld.height) { o.pos[5] = 0; o.pos[3] = currentWorld.height; }
+  send('replObj', [playerId, o])
 }
     if (o.library == "test") {
       if (o.type == "block") {
