@@ -63,7 +63,7 @@ async function loadServers() {
     const server = Object.assign(new URL(values.server), { search: new URLSearchParams([...new URL(values.server).searchParams, ["type", "ping"]]) }).href
     console.log(server)
     pingsocket = new WebSocket(server)
-    pingsocket.addEventListener("message", (event) => 
+    pingsocket.addEventListener("message", (event) => {
       const parsedData = JSON.parse(event.data);
       if (parsedData.type == 'ping') {
         document.getElementById('gamelist').insertAdjacentHTML('beforeend', `<button class="${classes}" id="${id}" onclick="setgamemode('${id}')">${values.label} <span class="counttext">${parsedData.online}</span>/<span class="counttext">${parsedData.max}</span></button>`);
