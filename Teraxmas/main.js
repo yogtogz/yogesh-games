@@ -1,6 +1,8 @@
 window.socket = null;
-window.moveX = 0;
-window.moveY = 0;
+let moveX = 0;
+let moveY = 0;
+let lastMoveX = 0;
+let lastMoveY = 0;
 let worldData;
 let gamemode = "ffa"
 let playerid = "player_object_id_here"
@@ -170,7 +172,11 @@ async function connect() {
     send('state', {})
   window.stateInterval = setInterval(() => {
   send('state', {})
-    if (moveX != 0 && moveY != 0) send('move', {"x": moveX, "y": moveY})
+    if (moveX !== 0 || moveY !== 0 || lastMoveX !== 0 || lastMoveY !== 0) {
+    send('move', { id: playerid, x: moveX, y: moveY });
+    lastMoveX = moveX;
+    lastMoveY = moveY;
+  }
 }, 50);
   };
 
