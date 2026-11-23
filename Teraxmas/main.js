@@ -101,7 +101,12 @@ async function connect() {
   };
 
   const handleMessage = (event) => {
-    packet(event);
+    try {
+    const parsedData = JSON.parse(event.data);
+      packet(event.data)
+  } catch (error) {
+    console.error("handleMessage: ", error);
+  }
   };
 
   const handleError = (error) => {
