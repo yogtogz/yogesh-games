@@ -141,7 +141,7 @@ async function play() {
     alert('unable to start playing :(')
     loadingScreen(false);
     menu(true);
-    alert('unable to start playing :(')
+    alert(loaded)
     const reload = confirm("Reload page? (May fix error, if it does not, it's probably being fixed right now.)")
     if (!reload) alert("Too bad you gotta reload.");
     const devkey = prompt("Enter skip reload key to continue (Not reccomended, non devs.)", "Yes please don't read the source code.");
