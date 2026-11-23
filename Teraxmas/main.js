@@ -84,25 +84,35 @@ function packet(data = {}) {
   if (data.type === 'state_variable') {
     const serverObjects = data.data.objects;
 
-    // 1. Update existing objects or add new ones
     serverObjects.forEach((serverObj) => {
       const existingObj = objects.find((obj) => obj.id === serverObj.id);
 
       if (existingObj) {
-        // Update properties without destroying the object reference
-        Object.assign(existingObj, serverObj);
+        if (serverObj.id === myId) {
+          // Keep your local pos[2..5] (x, y, vx, vy) so velocity/movement isn't wiped
+          existingObj.pos[0] = serverObj.pos[0]; // width
+          existingObj.pos[1] = serverObj.pos[1]; // height
+
+          // Update non-position stats from server
+          existingObj.exp = serverObj.exp;
+          existingObj.damage = serverObj.damage;
+          existingObj.hp = serverObj.hp;
+          existingObj.optional = serverObj.optional;
+          existingObj.tag = serverObj.tag;
+        } else {
+          Object.assign(existingObj, serverObj);
+        }
       } else {
-        // Add new object if it doesn't exist yet
         objects.push(serverObj);
       }
     });
 
-    // 2. Remove objects that the server deleted
     objects = objects.filter((localObj) =>
       serverObjects.some((serverObj) => serverObj.id === localObj.id)
     );
   }
 }
+
 function send(type, data) {
   if (!socket || socket.readyState !== 1) return;
   socket.send(JSON.stringify({ type, data }))
