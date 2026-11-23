@@ -25,7 +25,7 @@ const baseSpeed = 5;
 
 // HOW TO USE pos
 // id,library,type,[width, height, x, y, vx, vy],xp,damage,optional:opt], tag
-// "id": id, "library": lib, "type": ty, "pos": [w,h,x,y,vx,vy], "exp": xp, "damage": dmg, "hp":hp, "optional": opt, "tag":tag
+// "id": id, "library": lib, "type": ty, "pos": [w,h,x,y,vx,vy], "exp": xp, "damage": dmg, "hp":hp, "optional": opt, "tag":tag, "name": optional_name 
 // opt: [color/hex, radius for circle/tank, collide:[canCollide,BlockOrCircle]]
 let objects = [
   //{"id":"test_id","library":"test", "type":"block", "pos":[50,50,10,10,0,0], "optional":["blue",null,[true,"block"]]}
@@ -387,7 +387,29 @@ function handleKeys() {
     keys[e.key.toLowerCase()] = false;
   });
 }
+// Robot Function
+function scoreCalc(totalScore) {
+  let levels = 0;
+  let score = totalScore;
+  let step = 100;
+  let requiredForNext = 100;
 
+  while (score >= requiredForNext) {
+    score -= requiredForNext;
+    levels++;
+
+    if (levels % 9 === 0) {
+      step *= 10;
+    }
+
+    requiredForNext += step;
+  }
+
+  return {
+    lvl: levels,
+    score: score
+  };
+}
 let lastTime = 0;
 // W w3schools for the tutorial stuff
 function renderCanvas() {
@@ -436,6 +458,15 @@ let player = objects.find(o => o.id === playerid);
     ctx.lineTo(currentWorld.width, y);
     ctx.stroke();
   }
+  // time to make myself an xp bar (robotless, but tutorialful)
+  const xpsize = { "x": window.innerWidth / 3, "y": window.innerHeight / 20 }
+  const xploc = { "x": (window.innerWidth / 2) - xpsize.x, "y": window.innerHeight - xpsize.y }
+  ctx.beginPath();
+  ctx.roundRect(xploc.x, xploc.y, xpsize.x, xpsize.y, 20);
+  ctx.fillStyle = '#aeaeae'; // AEiou.
+  ctx.strokeStyle = '#0c0c0c'; // 0c0c0c0c0c0c0c0c0c0c0c0c....
+  ctx.lineWidth = 6; // hopefully... this is good.
+  ctx.fill();
 objects.forEach(o => {
     if (o.id == playerid) {
   moveX = 0;
@@ -451,6 +482,31 @@ objects.forEach(o => {
   }
   o.pos[4] = moveX * baseSpeed;
   o.pos[5] = moveY * baseSpeed;
+
+  
+  const calcName = {"x": window.innerWidth / 2, "y": xploc.y - 12}
+  ctx.font = 'Bold 24px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.strokeStyle = 'black';
+  ctx.lineWidth = 6;
+  ctx.lineJoin = 'round';
+  ctx.strokeText(o.name, calcName.x, calcName.y);
+  ctx.fillStyle = 'white';
+  ctx.fillText(o.name, calcName.x, calcName.y);
+      
+  const calcName = {"x": window.innerWidth / 2, "y": xploc.y + (xpsize.y / 2)}
+  ctx.font = 'Bold 24px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.strokeStyle = 'black';
+  ctx.lineWidth = 6;
+  ctx.lineJoin = 'round';
+  ctx.strokeText(scoreCalc(o.exp).level, calcName.x, calcName.y);
+  ctx.fillStyle = 'white';
+  ctx.fillText(scoreCalc(o.exp).level, calcName.x, calcName.y);
+  ctx.beginPath();
+  ctx.roundRect(xploc.x, xploc.y, scoreCalc(o.exp).score / xpsize.x, xpsize.y)
 }
     if (o.library == "test") {
       if (o.type == "block") {
@@ -460,8 +516,7 @@ objects.forEach(o => {
         ctx.lineWidth = 1;
         ctx.strokeRect(o.pos[2], o.pos[3], o.pos[0], o.pos[1]);
       }
-    } else if (o.library == "player") {
-      if (o.type == "tank") {
+      if (o.type == "circle") {
         ctx.fillStyle = o.optional[0];
         ctx.beginPath();
         ctx.arc(o.pos[2], o.pos[3], o.optional[1] || ((o.pos[0] / o.pos[1]) * 10), 0, 2 * Math.PI);
@@ -469,6 +524,30 @@ objects.forEach(o => {
         ctx.strokeStyle = borderColor(o.optional[0]);
         ctx.lineWidth = 1;
         ctx.stroke();
+      }
+    } else if (o.library == "player") {
+      if (o.type == "tank") {
+        const radius = o.optional || ((o.pos / o.pos) * 10);
+        ctx.fillStyle = o.optional;
+        ctx.beginPath();
+        ctx.arc(o.pos, o.pos, radius, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.strokeStyle = borderColor(o.optional);
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        const maxHp = o.maxHp || 100;
+        const hpPercent = Math.max(0, Math.min(1, o.hp / maxHp));
+        const barWidth = radius * 2.5;
+        const barHeight = 5;
+        const barX = o.pos - barWidth / 2;
+        const barY = o.pos + radius + 8;
+        ctx.fillStyle = "#555555";
+        ctx.fillRect(barX, barY, barWidth, barHeight);
+        ctx.fillStyle = "#85e37d";
+        ctx.fillRect(barX, barY, barWidth * hpPercent, barHeight);
+        ctx.strokeStyle = "#484848";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(barX, barY, barWidth, barHeight);
       }
     }
     o.pos[2] += o.pos[4]
