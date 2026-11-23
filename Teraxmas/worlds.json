@@ -3,6 +3,7 @@
     "width":20000,
     "height":20000,
     "playersizeincrease":110,
+    "maxplayers": 50,
     "server": "wss://teraxmas-ffa-backend.onrender.com"
   }
 }
