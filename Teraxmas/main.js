@@ -111,19 +111,21 @@ function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
 // state_variable: {type: 'state_variable', data:{'The Entire state variable': 'is here'}
 
 // robot
-function packet(data = {}) {
-  if (data.type == 'open') {}
+function packet(data) {
+  if (!data || typeof data !== 'object') return;
 
-  if (data.type == 'state_variable') {
-    const serverObjects = data.data.objects;
+  if (data.type === 'state_variable') {
+    const serverObjects = data.data.objects || [];
 
+    // 1. Add new objects or update existing ones
     serverObjects.forEach((serverObj) => {
       const existingObj = objects.find((obj) => obj.id === serverObj.id);
 
       if (existingObj) {
         if (serverObj.id === playerid) {
-          existingObj.pos = serverObj.pos; // width
-          existingObj.pos = serverObj.pos; // height
+          // Only sync width & height from server; keep local x, y, vx, vy (pos[2..5])
+          existingObj.pos = serverObj.pos;
+          existingObj.pos = serverObj.pos;
 
           // Sync server-controlled stats
           existingObj.exp = serverObj.exp;
@@ -139,9 +141,14 @@ function packet(data = {}) {
       }
     });
 
-    objects = objects.filter((localObj) =>
-      serverObjects.some((serverObj) => serverObj.id === localObj.id)
-    );
+    // 2. Remove deleted objects in-place (works even if `objects` is declared with `const`)
+    for (let i = objects.length - 1; i >= 0; i--) {
+      const localObj = objects[i];
+      const stillOnServer = serverObjects.some((sObj) => sObj.id === localObj.id);
+      if (!stillOnServer) {
+        objects.splice(i, 1);
+      }
+    }
   }
 }
 // self
@@ -162,57 +169,60 @@ window.addEventListener('pagehide', (event) => {
     handleLeave();
   }
 });
-// tutorial
-async function connect() {
-  window.socket = new WebSocket(server);
-   const handleOpen = (event) => {
-    console.log('Connected to WSS server');
-    socket.send(JSON.stringify({ type: 'greeting', data: { connected: true }}));
-     
-    send('state', {})
-  window.stateInterval = setInterval(() => {
-  send('state', {})
-    if (moveX !== 0 || moveY !== 0 || lastMoveX !== 0 || lastMoveY !== 0) {
-    send('move', { x: moveX, y: moveY, id: playerid, collide: true });
-    lastMoveX = moveX;
-    lastMoveY = moveY;
-  }
-}, 50);
-  };
+// originally tutorial, improved by robot
+function connect() {
+  return new Promise((resolve, reject) => {
+    window.socket = new WebSocket(server);
+    let lastMoveX = 0;
+    let lastMoveY = 0;
 
-  const handleMessage = (event) => {
-    try {
-    const parsedData = JSON.parse(event.data);
-      packet(parsedData)
-  } catch (error) {
-    console.error("handleMessage: ", error);
-  }
-  };
+    const handleOpen = () => {
+      console.log('Connected to WSS server');
+      window.socket.send(JSON.stringify({ type: 'greeting', data: { connected: true } }));
+      send('state', {});
 
-  const handleError = (error) => {
-    console.error('WebSocket error:', error);
-  };
+      window.stateInterval = setInterval(() => {
+        send('state', {});
+        if (moveX !== 0 || moveY !== 0 || lastMoveX !== 0 || lastMoveY !== 0) {
+          send('move', { id: playerid, x: moveX, y: moveY });
+          lastMoveX = moveX;
+          lastMoveY = moveY;
+        }
+      }, 50);
 
-  const handleClose = (event) => {
-    socket.send(JSON.stringify({ type: 'closing', data: { player: playerid }}));
-    console.log(`Disconnected (Code: ${event.code})`);
-    
-    socket.removeEventListener('open', handleOpen);
-    socket.removeEventListener('message', handleMessage);
-    socket.removeEventListener('error', handleError);
-    socket.removeEventListener('close', handleClose);
-    clearInterval(stateInterval)
-  };
+      resolve(true); // Only unblocks `await connect()` AFTER everything above is ready
+    };
 
-  socket.addEventListener('open', handleOpen);
-  socket.addEventListener('message', handleMessage);
-  socket.addEventListener('error', handleError);
-  socket.addEventListener('close', handleClose);
-  return new Promise((resolve) => {
-  if (window.socket.readyState === 1) return resolve(true);
-  window.socket.addEventListener("open", () => resolve(true), { once: true });
-});
+    const handleMessage = (event) => {
+      try {
+        const parsedData = JSON.parse(event.data);
+        packet(parsedData);
+      } catch (error) {
+        console.error("handleMessage error:", error);
+      }
+    };
+
+    const handleError = (error) => {
+      console.error('WebSocket error:', error);
+      reject(error);
+    };
+
+    const handleClose = (event) => {
+      console.log(`Disconnected (Code: ${event.code})`);
+      clearInterval(window.stateInterval);
+      window.socket.removeEventListener('open', handleOpen);
+      window.socket.removeEventListener('message', handleMessage);
+      window.socket.removeEventListener('error', handleError);
+      window.socket.removeEventListener('close', handleClose);
+    };
+
+    window.socket.addEventListener('open', handleOpen, { once: true });
+    window.socket.addEventListener('message', handleMessage);
+    window.socket.addEventListener('error', handleError);
+    window.socket.addEventListener('close', handleClose);
+  });
 }
+
 //const color = "#e8c764";
 //const border = borderColor(color);
 
