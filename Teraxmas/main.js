@@ -12,7 +12,7 @@ const camera = {
   y: 0,
   zoom:1.5
 };
-const baseSpeed = 1;
+const baseSpeed = 5;
 // Libraries: Shape Player Misc Test
 // Test: Block Circle
 // Test: Include pos:[width and height and x and y and other stuff]
