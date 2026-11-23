@@ -10,6 +10,7 @@ const camera = {
   y: 0,
   zoom:1.5
 };
+const baseSpeed = 1;
 // Libraries: Shape Player Misc Test
 // Test: Block Circle
 // Test: Include pos:[width and height and x and y and other stuff]
@@ -119,7 +120,6 @@ function packet(data = {}) {
 
       if (existingObj) {
         if (serverObj.id === playerid) {
-          // Keep your local x, y, vx, vy (pos[2..5]) so movement isn't overwritten
           existingObj.pos = serverObj.pos; // width
           existingObj.pos = serverObj.pos; // height
 
@@ -168,6 +168,10 @@ async function connect() {
     socket.send(JSON.stringify({ type: 'greeting', data: { connected: true }}));
      
     send('state', {})
+  window.stateInterval = setInterval(() => {
+  send('state', {})
+    if (moveX != 0 && moveY != 0) send('move', {"x": moveX, "y": moveY})
+}, 50);
   };
 
   const handleMessage = (event) => {
@@ -198,10 +202,6 @@ async function connect() {
   socket.addEventListener('message', handleMessage);
   socket.addEventListener('error', handleError);
   socket.addEventListener('close', handleClose);
-  window.stateInterval = setInterval(() => {
-  packet('state', {})
-    if (moveX != 0 && moveY != 0) send('move', {"x": moveX, "y": moveY})
-}, 50);
   return new Promise((resolve) => {
   if (window.socket.readyState === 1) return resolve(true);
   window.socket.addEventListener("open", () => resolve(true), { once: true });
@@ -352,7 +352,7 @@ async function renderGame(what) {
     ? window.entity.player.tank.color 
     : "#3ca4cb";
     playerid = idGen()
-    summonObject("player","tank", 0, 0, Math.random(0,worlds[gamemode].width), Math.random(0,worlds[gamemode].height), 0, 0, 100, 100, 100, [tankColor, 10], "player", playerid)
+    summonObject("player","tank", 0, 0, Math.random() * worlds[gamemode].width, Math.random() * worlds[gamemode].height, 0, 0, 100, 100, 100, [tankColor, 10], "player", playerid)
     requestAnimationFrame(loop);
     handleKeys(); // Handle key presses
     ui.style.display = "block";
@@ -431,6 +431,8 @@ objects.forEach(o => {
       moveX /= length;
       moveY /= length;
   }
+      o.pos = moveX * baseSpeed;
+  o.pos = moveY * baseSpeed;
 }
     if (o.library == "test") {
       if (o.type == "block") {
