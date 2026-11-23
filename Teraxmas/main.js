@@ -146,7 +146,6 @@ async function play() {
     if (!reload) alert("Too bad you gotta reload.");
     const devkey = prompt("Enter skip reload key to continue (Not reccomended, non devs.)", "Yes please don't read the source code.");
     if (devkey != "banana") window.location.reload();
-    window.location.reload()
   }
 }
 function setgamemode(mode) {
