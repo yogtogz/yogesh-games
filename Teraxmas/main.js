@@ -93,10 +93,7 @@ function send(type, data) {
   if (!socket) return;
   socket.emit(type, data);
 }
-function connect(mode) {
-  alert(mode)
-  window.server = worlds[mode].server
-
+function connect() {
   window.socket = new WebSocket(server + ":" + port);
    const handleOpen = (event) => {
     console.log('Connected to WSS server');
@@ -134,13 +131,12 @@ function connect(mode) {
 async function play() {
   loadingScreen(true);
   menu(false);
-  const loaded = await loadGame();
+  await registerJsonVariables();
+  window.server = worlds.ffa.server
+  const loaded = await connect();
   if (loaded == true) {
   await loadingScreen(false);
   await renderGame(true);
-  await registerJsonVariables();
-  window.server = worlds.ffa.server
-  await connect(gamemode);
   alert('started playing')
   } else {
     alert('unable to start playing :(')
@@ -178,10 +174,6 @@ function menu(what) {
   } else {
     ui.style.display = "none";
   }
-}
-async function loadGame() {
-  await connect()
-  return true;
 }
 // AI math. I'm dumber.
 // Checks if a specific object (obj1) is touching any valid colliders in the game world
