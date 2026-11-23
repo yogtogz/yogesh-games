@@ -90,6 +90,7 @@ function packet(data = {}) {
   }
 }
 function send(type, data) {
+  if (!socket) return;
   socket.emit(type, data);
 }
 function connect(mode) {
@@ -123,6 +124,8 @@ function connect(mode) {
   socket.addEventListener('message', handleMessage);
   socket.addEventListener('error', handleError);
   socket.addEventListener('close', handleClose);
+
+  return true;
 }
 //const color = "#e8c764";
 //const border = borderColor(color);
@@ -174,8 +177,8 @@ function menu(what) {
     ui.style.display = "none";
   }
 }
-function loadGame() {
-  alert("loading game");
+async function loadGame() {
+  await connect()
   return true;
 }
 // AI math. I'm dumber.
