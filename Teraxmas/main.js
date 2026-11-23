@@ -1,4 +1,6 @@
 window.socket = null;
+window.moveX = 0;
+window.moveY = 0;
 let worldData;
 let gamemode = "ffa"
 let playerid = "player_object_id_here"
@@ -182,11 +184,14 @@ async function connect() {
   socket.addEventListener('message', handleMessage);
   socket.addEventListener('error', handleError);
   socket.addEventListener('close', handleClose);
+  window.stateInterval = setInterval(() => {
+  packet('send', {})
+    send('move', {"x": moveX, "y": moveY})
+}, 50);
   return new Promise((resolve) => {
   if (window.socket.readyState === 1) return resolve(true);
   window.socket.addEventListener("open", () => resolve(true), { once: true });
 });
-
 }
 //const color = "#e8c764";
 //const border = borderColor(color);
@@ -401,8 +406,8 @@ let player = objects.find(o => o.tag === "player" && o.id === playerid);
   }
 objects.forEach(o => {
     if (o.tag == "player" && o.id == playerid) {
-  let moveX = 0;
-  let moveY = 0;
+  moveX = 0;
+  moveY = 0;
   if (keys["d"]) moveX += 1;
   if (keys["a"]) moveX -= 1;
   if (keys["s"]) moveY += 1;
@@ -412,7 +417,6 @@ objects.forEach(o => {
       moveX /= length;
       moveY /= length;
   }
-      send('move', {"x": moveX, "y": moveY})
 }
     if (o.library == "test") {
       if (o.type == "block") {
