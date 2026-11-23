@@ -87,7 +87,7 @@ loadServers()
 // yes sorry guys I decided to... It's just one function
 function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
     const hexToRgb = (hex) => {
-        let cleanHex = hex.replace('#', '');
+        let cleanHex = String(hex ?? '').replace('#', '');
         return {
             r: parseInt(cleanHex.substring(0, 2), 16),
             g: parseInt(cleanHex.substring(2, 4), 16),
