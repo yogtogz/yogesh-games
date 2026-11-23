@@ -138,6 +138,8 @@ async function play() {
   if (loaded == true) {
   await loadingScreen(false);
   await renderGame(true);
+  await registerJsonVariables();
+  window.server = worlds.ffa.server
   await connect(gamemode);
   alert('started playing')
   } else {
@@ -282,27 +284,14 @@ async function renderGame(what) {
   alert("rendering game");
   let ui = document.getElementById("gamecanvas");
   if (what) {
-    const json = await registerJsonVariables();
-    window.server = worlds.ffa.server
   let tankColor = (window.entity && window.entity.player && window.entity.player.tank)
     ? window.entity.player.tank.color 
     : "#3ca4cb";
   playerid = summonObject("player","tank", 0, 0, Math.random(0,worlds[gamemode].width), Math.random(0,worlds[gamemode].height), 0, 0, 100, 100, 100, [tankColor, 10], "player").id;
-  // AWAITALL
-  const work = json && true // replace true with other stuff
-  if (work) {
     requestAnimationFrame(loop);
     handleKeys(); // Handle key presses
     ui.style.display = "block";
     return true;
-  } else {
-    alert("Game did not successfully load. Please reload or something.")
-    const reloadit = confirm("Reload?")
-    if (! reloadit) alert("too bad you need to reload.");
-    const devkey = prompt("Enter skip reload key to continue (Not reccomended, non devs.)", "Yes please don't read the source code.");
-    if (devkey != "banana") window.location.reload();
-    return false;
-  }
     } else {
     ui.style.display = "none";
   }
