@@ -57,6 +57,7 @@ async function registerJsonVariables() {
 }
 async function loadServers() {
   await registerJsonVariables();
+  await Promise.all(
   Object.entries(worlds).forEach(([id, values]) => {
     let classes = 'choose'
     if (id == gamemode) classes = 'choose choosen'
@@ -74,6 +75,7 @@ async function loadServers() {
     }, { once: true });
     await once(socket, 'close');
   });
+  );
 }
 // yes sorry guys I decided to... It's just one function
 function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
