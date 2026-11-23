@@ -380,13 +380,14 @@ async function renderGame(what) {
 }
 
 function handleKeys() {
-  document.onkeydown = function(key) {
-  keys[key.key] = true
-  };
-  document.onkeyup = function(key) {
-  keys[key.key] = false
-  };
+  window.addEventListener("keydown", (e) => {
+    keys[e.key.toLowerCase()] = true;
+  });
+  window.addEventListener("keyup", (e) => {
+    keys[e.key.toLowerCase()] = false;
+  });
 }
+
 let lastTime = 0;
 // W w3schools for the tutorial stuff
 function renderCanvas() {
@@ -403,7 +404,7 @@ function renderCanvas() {
 ctx.setTransform(1, 0, 0, 1, 0, 0); 
 ctx.clearRect(0, 0, canvas.width, canvas.height);
 // Math and Rendering? Me, A Dummy? In Javascript? Robot Time.
-let player = objects.find(o => o.tag === "player" && o.id === playerid);
+let player = objects.find(o => o.id === playerid);
   if (player) {
     camera.x += (player.pos[2] - camera.x) * 0.1;
     camera.y += (player.pos[3] - camera.y) * 0.1;
@@ -436,7 +437,7 @@ let player = objects.find(o => o.tag === "player" && o.id === playerid);
     ctx.stroke();
   }
 objects.forEach(o => {
-    if (o.tag == "player" && o.id == playerid) {
+    if (o.id == playerid) {
   moveX = 0;
   moveY = 0;
   if (keys["d"]) moveX += 1;
@@ -448,8 +449,8 @@ objects.forEach(o => {
       moveX /= length;
       moveY /= length;
   }
-  o.pos[4] = moveX;
-  o.pos[5] = moveY;
+  o.pos[4] = moveX * baseSpeed;
+  o.pos[5] = moveY * baseSpeed;
 }
     if (o.library == "test") {
       if (o.type == "block") {
