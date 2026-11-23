@@ -1,4 +1,3 @@
-window.server = 'localhost';
 window.socket = null;
 const port = 443
 let worldData;
@@ -57,6 +56,7 @@ async function registerJsonVariables() {
   window.worlds = await definitionJsonLoader("worlds");
   return true;
 }
+window.server = worlds.ffa.server
 // yes sorry guys I decided to... It's just one function
 function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
     const hexToRgb = (hex) => {
@@ -397,7 +397,7 @@ let actualSpeed = baseSpeed * (50 / diameter);
   if (nextX > currentWorld.width) { o.pos[4] = 0; o.pos[2] = currentWorld.width; }
   if (nextY < 0) { o.pos[5] = 0; o.pos[3] = 0; }
   if (nextY > currentWorld.height) { o.pos[5] = 0; o.pos[3] = currentWorld.height; }
-  send('replObj', [playerId, o])
+  send('replObj', [playerid, o])
 }
     if (o.library == "test") {
       if (o.type == "block") {
