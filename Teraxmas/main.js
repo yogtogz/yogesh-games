@@ -81,9 +81,7 @@ function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
 // data: {type, data}
 // state_variable: {type: 'state_variable', data:{'The Entire state variable': 'is here'}
 function packet(data = {}) {
-  if (data.type == 'open') {
-    
-  }
+  if (data.type == 'open') {}
   if (data.type == 'state_variable') {
     objects = data.data.objects
   }
@@ -97,6 +95,8 @@ async function connect() {
    const handleOpen = (event) => {
     console.log('Connected to WSS server');
     socket.send(JSON.stringify({ type: 'greeting', data: { connected: true }}));
+     
+    send('state', {})
   };
 
   const handleMessage = (event) => {
