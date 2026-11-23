@@ -120,7 +120,7 @@ async function connect() {
   socket.addEventListener('message', handleMessage);
   socket.addEventListener('error', handleError);
   socket.addEventListener('close', handleClose);
-  await socket;
+  alert(await socket);
   const loadedwebsocket = socket && socket.readyState === WebSocket.OPEN;
   return loadedwebsocket;
 }
