@@ -91,7 +91,7 @@ function packet(data = {}) {
 }
 function send(type, data) {
   if (!socket) return;
-  socket.emit(type, data);
+  socket.send(JSON.stringify({ type, data }))
 }
 function connect() {
   window.socket = new WebSocket(server + ":" + port);
