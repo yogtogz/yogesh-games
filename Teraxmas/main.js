@@ -562,8 +562,8 @@ objects.forEach(o => {
         ctx.stroke();
       }
     } else if (o.library == "player") {
+      const radius = o.optional[1] || ((o.pos[0] / o.pos[1]) * 10) || 10;
       if (o.type == "tank") {
-        const radius = o.optional[1] || ((o.pos[0] / o.pos[1]) * 10) || 10;
         ctx.fillStyle = o.optional[0];
         ctx.beginPath();
         ctx.arc(o.pos[2], o.pos[3], radius, 0, 2 * Math.PI);
