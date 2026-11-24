@@ -723,8 +723,14 @@ window.onwheel = function(event) {
     camera.zoom = Math.min(50, camera.zoom + 0.1);
   }
 };
-document.getElementById('play').addEventListener("click", () => {
-  console.log("Playing")
-  play();
+document.addEventListener("DOMContentLoaded", () => {
+  const playBtn = document.getElementById("play");
+  if (!playBtn) window.location.reload();
+
+  playBtn.addEventListener("click", () => {
+    console.log("Playing");
+    play();
+  });
 });
+
 })
