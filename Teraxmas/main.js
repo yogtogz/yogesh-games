@@ -567,7 +567,7 @@ objects.forEach(o => {
         ctx.translate(o.pos[2], o.pos[3]);
         ctx.rotate(o.angle || 0);
         
-        const turrets = builds[o.optional?.[3] || 'basic']?.[6] || [];
+        const turrets = entity.builds[o.optional?.[3] || 'basic']?.[6] || [];
         
         ctx.fillStyle = '#999999';
         ctx.strokeStyle = borderColor('#999999');
