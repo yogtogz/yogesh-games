@@ -1,4 +1,4 @@
-(() => {
+//(() => {
 window.socket = null; // hmm.. why is it a window, that's like not even required!!!!!!!!!
 let moveX = 0;
 let moveY = 0;
@@ -747,4 +747,4 @@ window.onwheel = function(event) {
   }
 };
 document.getElementById('play').addEventListener('click', play);
-})()
+//})()
