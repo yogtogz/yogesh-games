@@ -724,6 +724,7 @@ window.onwheel = function(event) {
   }
 };
 document.getElementById('play').addEventListener("click", () => {
+  console.log("Playing")
   play();
 });
 })
