@@ -423,7 +423,7 @@ function renderCanvas() {
   canvas.height = window.innerHeight * dpr;
   ctx.scale(dpr, dpr);
 
-ctx.setTransform(1, 0, 0, 1, 0, 0); 
+//ctx.setTransform(1, 0, 0, 1, 0, 0); 
 ctx.clearRect(0, 0, canvas.width, canvas.height);
 // Math and Rendering? Me, A Dummy? In Javascript? Robot Time.
 let player = objects.find(o => o.id === playerid);
