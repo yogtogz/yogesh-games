@@ -529,12 +529,15 @@ objects.forEach(o => {
   const xpsize = { "x": window.innerWidth / 3, "y": window.innerHeight / 20 }
   const xploc = { "x": (window.innerWidth / 2) - xpsize.x, "y": window.innerHeight - xpsize.y }
   ctx.beginPath();
-  ctx.roundRect(xploc.x, xploc.y, xpsize.x, xpsize.y, 20);
+  ctx.roundRect(xpsize.x, xpsize.y, xploc.x, xploc.y, 20);
   ctx.fillStyle = '#aeaeae'; // AEiou.
   ctx.strokeStyle = '#0c0c0c'; // 0c0c0c0c0c0c0c0c0c0c0c0c....
   ctx.lineWidth = 6; // hopefully... this is good.
+  ctx.fill();
   
   const calcName = {"x": window.innerWidth / 2, "y": xploc.y - 12}
+  const calcScore = {"x": window.innerWidth / 2, "y": xploc.y + (xpsize.y / 2)}
+  ctx.beginPath();
   ctx.font = 'Bold 24px Arial';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -544,19 +547,13 @@ objects.forEach(o => {
   ctx.strokeText(playername, calcName.x, calcName.y);
   ctx.fillStyle = 'white';
   ctx.fillText(playername, calcName.x, calcName.y);
-      
-  const calcScore = {"x": window.innerWidth / 2, "y": xploc.y + (xpsize.y / 2)}
-  ctx.font = 'Bold 24px Arial';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.strokeStyle = 'black';
-  ctx.lineWidth = 6;
-  ctx.lineJoin = 'round';
   ctx.strokeText(scoreCalc(playerxp).level, calcScore.x, calcScore.y);
-  ctx.fillStyle = 'white';
   ctx.fillText(scoreCalc(playerxp).level, calcScore.x, calcScore.y);
+  ctx.fill();
+  
   ctx.beginPath();
-  ctx.roundRect(xploc.x, xploc.y, scoreCalc(o.exp).score / xpsize.x, xpsize.y);
+  ctx.fillStyle = '#00FF00'
+  ctx.roundRect(scoreCalc(playerxp).score / xpsize.x, xpsize.y, xploc.x, xploc.y, );
   ctx.fill();
 }
 function loop(currentTime) {
