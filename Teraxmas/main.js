@@ -129,7 +129,8 @@ function packet(data) {
   if (data.type === 'state_variable') {
     const serverObjects = data.data.objects || [];
     const serverShapes = data.data.shapes || [];
-  
+  console.log(serverObjects)
+    console.log(serverShapes)
     // --- SYNC OBJECTS ---
     // 1. Add new objects or update existing ones
     serverObjects.forEach((serverObj) => {
@@ -231,11 +232,11 @@ function connect() {
           console.log("look")
           playerthingy.pos[6] = Math.atan2(mouseY - window.innerHeight / 2, mouseX - window.innerWidth / 2);
         }
-        send('state', { id: playerid, angle: playerthingy.pos[6] });
         wasFiring = isFiring
         isFiring = Boolean(autofire || keys.space || keys.click);
         if (isFiring != wasFiring) send('shoot', {id: playerid, isFiring: isFiring, angle: playerthingy.pos[6]});
         }
+        send('state', { id: playerid, angle: playerthingy.pos[6] });
       }, 50);
 
       resolve(true); // Only unblocks `await connect()` AFTER everything above is ready
