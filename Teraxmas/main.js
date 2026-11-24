@@ -222,12 +222,14 @@ function connect() {
           lastMoveY = moveY;
         }
         let playerthingy = objects.find(child => child.type === playerid)
+        if (playerthingy?.pos) {
         if (autospin) {
           playerthingy.pos[6] = (playerthingy.pos[6] + 0.02) % (2 * Math.PI)
         } else {
           playerthingy.pos[6] = Math.atan2(mouseY - window.innerHeight / 2, mouseX - window.innerWidth / 2);
         }
         send('shoot', {id: playerid, isFiring: autofire || keys.space || keys.click, angle: playerthingy.pos[6]})
+        }
       }, 50);
 
       resolve(true); // Only unblocks `await connect()` AFTER everything above is ready
