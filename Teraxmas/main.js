@@ -20,8 +20,6 @@ const baseSpeed = 5;
 // Test: Include pos:[width and height and x and y and other stuff]
 // Player: Type of player: tank, godly, strange
 // Player: scale, x, y, experience, other stuff.
-// Shape: from entity.json I guess.
-// Shape: Include scale, x, y, experience  (experience is scale)
 // Wall: Walls: Wall Triwall/3wall Quadwall/4wall etc. see RenderCanvas() for the names.
 // Wall: all of pos, optional/color, and canCollide, Block or circle.
 // Misc: Bullet
