@@ -564,6 +564,34 @@ objects.forEach(o => {
     } else if (o.library == "player") {
       const radius = o.optional[1] || ((o.pos[0] / o.pos[1]) * 10) || 10;
       if (o.type == "tank") {
+        ctx.translate(o.pos[2], o.pos[3]);
+        ctx.rotate(o.angle || 0);
+        
+        const turrets = builds[o.optional?.[3] || 'basic']?.[6] || [];
+        
+        ctx.fillStyle = '#999999';
+        ctx.strokeStyle = borderColor('#999999');
+        ctx.lineWidth = 2;
+        
+        for (const t of turrets) {
+          const rad = (t[2] * Math.PI) / 180;
+          ctx.rotate(rad);
+        
+          ctx.beginPath();
+          ctx.rect(t[4], t[3] - t[5] / 2, t[6], t[5]);
+          ctx.fill();
+          ctx.stroke();
+        
+          ctx.rotate(-rad);
+        }
+        
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        ctx.fillStyle = o.optional?.[0] || '#00b2e1';
+        ctx.fill();
+        ctx.strokeStyle = borderColor(o.optional?.[0] || '#00b2e1');
+        ctx.stroke();
+
         ctx.fillStyle = o.optional[0];
         ctx.beginPath();
         ctx.arc(o.pos[2], o.pos[3], radius, 0, 2 * Math.PI);
@@ -584,20 +612,6 @@ objects.forEach(o => {
         ctx.fillStyle = '#ffffff';
         ctx.fillText(o.name, o.pos[2], o.pos[3] - radius - 3);
       }
-      ctx.translate(o.pos[2], o.pos[3]);
-      ctx.rotate(o.angle || 0);
-    
-      const rectLength = radius * 1.8;
-      const rectWidth = radius * 0.8;
-    
-      ctx.fillStyle = '#999999';
-      ctx.strokeStyle = borderColor('#999999');
-      ctx.lineWidth = 2;
-    
-      ctx.beginPath();
-      ctx.rect(0, -rectWidth / 2, rectLength, rectWidth);
-      ctx.fill();
-      ctx.stroke();
     } else if (o.library == "wall") {
       if (o.type == "wall") {
         if (o.optional[3][2] == 'circle') {
