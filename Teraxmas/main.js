@@ -369,7 +369,7 @@ async function renderGame(what) {
     ? window.entity.player.tank.color 
     : "#3ca4cb";
     playerid = idGen()
-    summonObject("player","tank", 0, 0, Math.random() * worlds[gamemode].width, Math.random() * worlds[gamemode].height, 0, 0, 100, 100, 100, [tankColor, 10], "player", playerid, (document.getElementById('name').value !== "" ?  document.getElementById('name').value || "Nameless Tank"))
+    summonObject("player","tank", 0, 0, Math.random() * worlds[gamemode].width, Math.random() * worlds[gamemode].height, 0, 0, 100, 100, 100, [tankColor, 10], "player", playerid, document.getElementById('name').value !== "" ?  document.getElementById('name').value : "Nameless Tank")
     requestAnimationFrame(loop);
     handleKeys(); // Handle key presses
     ui.style.display = "block";
