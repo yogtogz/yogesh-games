@@ -1,4 +1,7 @@
+console.log("1. main.js loaded");
+console.log("2. play element:", document.getElementById("play"));
 (() => {
+console.log("3. IIFE")
 window.socket = null; // hmm.. why is it a window, that's like not even required!!!!!!!!!
 let moveX = 0;
 let moveY = 0;
