@@ -358,8 +358,8 @@ function idGen() {
     }
     return result;
 }
-function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, xp=0, dmg=0, hp=100, opt=["default", null,[false,"block"]], tag=null,id=idGen()) {
-  if (lib == "player") send('player_new', [lib, ty, w, h, x, y, vx, vy, xp, dmg, hp, opt, tag, id])
+function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, xp=0, dmg=0, hp=100, opt=["default", null,[false,"block"]], tag=null,id=idGen(), name = "") {
+  if (lib == "player") send('player_new', [lib, ty, w, h, x, y, vx, vy, xp, dmg, hp, opt, tag, id, name])
 }
 async function renderGame(what) {
   alert("rendering game");
@@ -369,7 +369,7 @@ async function renderGame(what) {
     ? window.entity.player.tank.color 
     : "#3ca4cb";
     playerid = idGen()
-    summonObject("player","tank", 0, 0, Math.random() * worlds[gamemode].width, Math.random() * worlds[gamemode].height, 0, 0, 100, 100, 100, [tankColor, 10], "player", playerid)
+    summonObject("player","tank", 0, 0, Math.random() * worlds[gamemode].width, Math.random() * worlds[gamemode].height, 0, 0, 100, 100, 100, [tankColor, 10], "player", playerid, document.getElementById('name').value)
     requestAnimationFrame(loop);
     handleKeys(); // Handle key presses
     ui.style.display = "block";
@@ -498,12 +498,12 @@ objects.forEach(o => {
       }
     } else if (o.library == "player") {
       if (o.type == "tank") {
-        const radius = o.optional || ((o.pos / o.pos) * 10);
-        ctx.fillStyle = o.optional;
+        const radius = o.optional[1] || ((o.pos / o.pos) * 10);
+        ctx.fillStyle = o.optional[0];
         ctx.beginPath();
         ctx.arc(o.pos, o.pos, radius, 0, 2 * Math.PI);
         ctx.fill();
-        ctx.strokeStyle = borderColor(o.optional);
+        ctx.strokeStyle = borderColor(o.optional[0]);
         ctx.lineWidth = 1;
         ctx.stroke();
         const maxHp = o.maxHp || 100;
@@ -529,10 +529,10 @@ objects.forEach(o => {
   const xpsize = { "x": window.innerWidth / 3, "y": window.innerHeight / 20 }
   const xploc = { "x": (window.innerWidth / 2) - xpsize.x, "y": window.innerHeight - xpsize.y }
   ctx.beginPath();
-  ctx.roundRect(xpsize.x, xpsize.y, xploc.x, xploc.y, 20);
   ctx.fillStyle = '#aeaeae'; // AEiou.
   ctx.strokeStyle = '#0c0c0c'; // 0c0c0c0c0c0c0c0c0c0c0c0c....
   ctx.lineWidth = 6; // hopefully... this is good.
+  ctx.roundRect(xploc.x, xploc.y, xpsize.x, xpsize.y, 20);
   ctx.fill();
   
   const calcName = {"x": window.innerWidth / 2, "y": xploc.y - 12}
@@ -553,7 +553,7 @@ objects.forEach(o => {
   
   ctx.beginPath();
   ctx.fillStyle = '#00FF00'
-  ctx.roundRect(scoreCalc(playerxp).score / xpsize.x, xpsize.y, xploc.x, xploc.y, );
+  ctx.roundRect(xploc.x, xploc.y, scoreCalc(playerxp).score / xpsize.x, xpsize.y);
   ctx.fill();
 }
 function loop(currentTime) {
