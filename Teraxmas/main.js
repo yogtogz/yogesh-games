@@ -129,8 +129,6 @@ function packet(data) {
   if (data.type === 'state_variable') {
     const serverObjects = data.data.objects || [];
     const serverShapes = data.data.shapes || [];
-  console.log(serverObjects)
-    console.log(serverShapes)
     // --- SYNC OBJECTS ---
     // 1. Add new objects or update existing ones
     serverObjects.forEach((serverObj) => {
@@ -226,11 +224,11 @@ function connect() {
         if (playerthingy?.pos) {
           console.log(playerthingy.pos[6])
         if (autospin) {
-          console.log("spin")
-          playerthingy.pos[6] = (playerthingy.pos[6] + 0.02) % (2 * Math.PI)
+          playerthingy.pos[6] = (playerthingy.pos[6] + 0.03) % (2 * Math.PI)
         } else {
-          console.log("look")
-          playerthingy.pos[6] = Math.atan2(mouseY - window.innerHeight / 2, mouseX - window.innerWidth / 2);
+          const screenX = window.innerWidth / 2 + (playerthingy.pos - camX);
+          const screenY = window.innerHeight / 2 + (playerthingy.pos - camY);
+          playerthingy.pos = Math.atan2(mouseY - screenY, mouseX - screenX);
         }
         wasFiring = isFiring
         isFiring = Boolean(autofire || keys.space || keys.click);
@@ -590,7 +588,8 @@ objects.forEach(o => {
         
           ctx.rotate(-rad);
         }
-        
+        ctx.rotate(-(o.pos || 0));
+        ctx.translate(-o.pos, -o.pos);
         ctx.beginPath();
         ctx.arc(0, 0, radius, 0, Math.PI * 2);
         ctx.fillStyle = o.optional?.[0] || '#00b2e1';
