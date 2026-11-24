@@ -498,7 +498,7 @@ objects.forEach(o => {
       }
     } else if (o.library == "player") {
       if (o.type == "tank") {
-        const radius = o.optional[1] || ((o.pos / o.pos) * 10);
+        const radius = o.optional[1] || ((o.pos[0] / o.pos[1]) * 10) || 10;
         ctx.fillStyle = o.optional[0];
         ctx.beginPath();
         ctx.arc(o.pos[2], o.pos[3], radius, 0, 2 * Math.PI);
@@ -506,19 +506,19 @@ objects.forEach(o => {
         ctx.strokeStyle = borderColor(o.optional[0]);
         ctx.lineWidth = 1;
         ctx.stroke();
-        const maxHp = o.maxHp || 100;
-        const hpPercent = Math.max(0, Math.min(1, o.hp / maxHp));
-        const barWidth = radius * 2.5;
-        const barHeight = 5;
-        const barX = o.pos - barWidth / 2;
-        const barY = o.pos + radius + 8;
-        ctx.fillStyle = "#555555";
-        ctx.fillRect(barX, barY, barWidth, barHeight);
-        ctx.fillStyle = "#85e37d";
-        ctx.fillRect(barX, barY, barWidth * hpPercent, barHeight);
-        ctx.strokeStyle = "#484848";
-        ctx.lineWidth = 1;
-        ctx.strokeRect(barX, barY, barWidth, barHeight);
+      
+        if (o.name) {
+          ctx.font = 'bold 12px Arial';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.strokeStyle = '#000000';
+          ctx.lineWidth = 3;
+          ctx.lineJoin = 'round';
+          ctx.strokeText(o.name, o.pos[2], o.pos[3] - radius - 6);
+      
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(o.name, o.pos[2], o.pos[3] - radius - 6);
+        }
       }
     }
     o.pos[2] += o.pos[4]
@@ -536,7 +536,7 @@ objects.forEach(o => {
   ctx.fill();
   ctx.stroke();
   
-  const calcName = {"x": window.innerWidth / 2, "y": xploc.y - 12}
+  const calcName = {"x": window.innerWidth / 2, "y": xploc.y - 16}
   const calcScore = {"x": window.innerWidth / 2, "y": xploc.y + (xpsize.y / 2)}
   ctx.beginPath();
   ctx.font = 'Bold 24px Arial';
@@ -548,8 +548,8 @@ objects.forEach(o => {
   ctx.strokeText(playername || "A Strange Player", calcName.x, calcName.y);
   ctx.fillStyle = 'white';
   ctx.fillText(playername || "A Strange Player", calcName.x, calcName.y);
-  ctx.strokeText("Level " + String(scoreCalc(playerxp).level), calcScore.x, calcScore.y);
-  ctx.fillText("Level " + String(scoreCalc(playerxp).level), calcScore.x, calcScore.y);
+  ctx.strokeText("Level " + String(scoreCalc(playerxp).lvl), calcScore.x, calcScore.y);
+  ctx.fillText("Level " + String(scoreCalc(playerxp).lvl), calcScore.x, calcScore.y);
   ctx.fill();
   
   ctx.beginPath();
