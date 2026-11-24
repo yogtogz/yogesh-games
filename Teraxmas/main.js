@@ -427,7 +427,7 @@ function handleKeys() {
     if (e.key.toLowerCase() === 'e') {
       autofire = !autofire
     }
-    if (e.key.toLowerCase() === 'c' {
+    if (e.key.toLowerCase() === 'c') {
       autospin = !autospin
     }
   })
