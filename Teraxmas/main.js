@@ -1,3 +1,4 @@
+(() => {
 window.socket = null;
 let moveX = 0;
 let moveY = 0;
@@ -12,6 +13,7 @@ const camera = {
   y: 0,
   zoom:1.5
 };
+const worldCache = {};
 const baseSpeed = 5;
 // Libraries: Shape Player Misc Test
 // Test: Block Circle
@@ -20,6 +22,8 @@ const baseSpeed = 5;
 // Player: scale, x, y, experience, other stuff.
 // Shape: from entity.json I guess.
 // Shape: Include scale, x, y, experience  (experience is scale)
+// Wall: Walls: Wall Triwall/3wall Quadwall/4wall etc. see RenderCanvas() for the names.
+// Wall: all of pos, optional/color, and canCollide, Block or circle.
 // Misc: Bullet
 // Musc: scale,x,y,shape,damage,vx,vy (v = velocity)
 
@@ -75,6 +79,7 @@ async function loadServers() {
       const parsedData = JSON.parse(event.data);
       if (parsedData.type == 'ping') {
         document.getElementById('gamelist').insertAdjacentHTML('beforeend', `<button class="${classes}" id="${id}" onclick="setgamemode('${id}')">${values.label} <span class="counttext">${parsedData.data.online}</span>/<span class="counttext">${parsedData.data.max}</span></button>`);
+        worldCache[id] = values
       }
       if (pingsocket.readyState === WebSocket.OPEN) {
         pingsocket.close();
@@ -359,18 +364,16 @@ function idGen() {
     return result;
 }
 function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, xp=0, dmg=0, hp=100, opt=["default", null,[false,"block"]], tag=null,id=idGen(), name = "") {
-  console.log(name)
   if (lib == "player") send('player_new', [lib, ty, w, h, x, y, vx, vy, xp, dmg, hp, opt, tag, id, name])
 }
 async function renderGame(what) {
-  alert("rendering game");
   let ui = document.getElementById("gamecanvas");
   if (what) {
   let tankColor = (window.entity && window.entity.player && window.entity.player.tank)
     ? window.entity.player.tank.color 
     : "#3ca4cb";
     playerid = idGen()
-    summonObject("player","tank", 0, 0, Math.random() * worlds[gamemode].width, Math.random() * worlds[gamemode].height, 0, 0, 100, 100, 100, [tankColor, 10], "player", playerid, (document.getElementById('name').value.trim() !== "" ?  document.getElementById('name').value : "Nameless Tank"))
+    summonObject("player","tank", 0, 0, Math.random() * worldCache[gamemode].width, Math.random() * worldCache[gamemode].height, 0, 0, 100, 100, 100, [tankColor, 10], "player", playerid, (document.getElementById('name').value.trim() !== "" ?  document.getElementById('name').value : "Nameless Tank"))
     requestAnimationFrame(loop);
     handleKeys(); // Handle key presses
     ui.style.display = "block";
@@ -438,7 +441,7 @@ let player = objects.find(o => o.id === playerid);
   ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
   ctx.scale(camera.zoom, camera.zoom);
   ctx.translate(-camera.x, -camera.y);
-  let currentWorld = worlds && worlds[gamemode] ? worlds[gamemode] : { width: 50000, height: 50000 };
+  let currentWorld = worldCache[gamemode] ? worldCache[gamemode] : (worlds && worldCache[gamemode] ? worldCache[gamemode] : { width: 1000, height: 1000 });
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, currentWorld.width, currentWorld.height);
   ctx.strokeStyle = "#cccccc";
@@ -521,6 +524,54 @@ objects.forEach(o => {
           ctx.fillText(o.name, o.pos[2], o.pos[3] - radius - 3);
         }
       }
+    } else if (o.library == "wall") {
+      if (o.type == "wall") {
+        if (o.optional[3][2] == 'circle') {
+          ctx.fillStyle = o.optional[0];
+          ctx.beginPath();
+          ctx.arc(o.pos[2], o.pos[3], o.optional[1] || ((o.pos[0] / o.pos[1]) * 10), 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.strokeStyle = borderColor(o.optional[0]);
+          ctx.lineWidth = 4;
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = o.optional[0];
+          ctx.fillRect(o.pos[2], o.pos[3], o.pos[0], o.pos[1]);
+          ctx.strokeStyle = borderColor(o.optional[0]);
+          ctx.lineWidth = 6;
+          ctx.strokeRect(o.pos[2], o.pos[3], o.pos[0], o.pos[1]);
+        }
+      }
+      let multiwall = false
+      let wallsides = 3
+      if (o.type == 'triwall') {multiwall = true; wallsides = 3}
+      if (o.type == 'quadwall') {multiwall = true; wallsides = 4}
+      if (o.type == 'quintwall' || o.type == '5wall') {multiwall = true; wallsides = 5}
+      if (o.type == 'sexwall' || o.type == 'hexwall' || o.type == '6wall') {multiwall = true; wallsides = 6}
+      if (o.type == 'sepwall' || o.type == 'hepwall' || o.type == 'septawall' || o.type == 'heptawall' || o.type == '7wall') {multiwall = true; wallsides = 7}
+      if (o.type == 'octowall' || o.type == 'octawall' || o.type == '8wall') {multiwall = true; wallsides = 8}
+      if (o.type == 'nonawall' || o.type == '9wall') {multiwall = true; wallsides = 9}
+      if (o.type == 'decawall' || o.type == '10wall') {multiwall = true; wallsides = 10}
+      if (o.type == 'hendecawall' || o.type == '11wall') {multiwall = true; wallsides = 11}
+      if (o.type == 'dodecawall' || o.type == '12wall') {multiwall = true; wallsides = 12}
+      if (multiwall) {
+        for (let i = 0; i < wallsides; i++) {
+          const angle = i * (Math.PI * 2) / wallsides;
+          const x = centerX + radius * Math.cos(angle);
+          const y = centerY + radius * Math.sin(angle);
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        }
+        ctx.closePath();
+        ctx.fillStyle = o.optional[0];
+        ctx.fill();
+        ctx.strokeStyle = borderColor(o.optional[0]);
+        ctx.lineWidth = 4;
+        ctx.stroke();
+      }
     }
     o.pos[2] += o.pos[4]
     o.pos[3] += o.pos[5]
@@ -574,4 +625,4 @@ window.onwheel = function(event) {
     camera.zoom = Math.min(50, camera.zoom + 0.1);
   }
 };
-
+})
