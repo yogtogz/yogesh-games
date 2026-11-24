@@ -222,11 +222,13 @@ function connect() {
           lastMoveY = moveY;
         }
         let playerthingy = objects.find(child => child.id === playerid)
-        console.log(playerthingy)
         if (Array.isArray(playerthingy?.pos) && playerthingy.pos.length === 7) {
+          console.log(playerthingy.pos[6])
         if (autospin) {
+          console.log("spin")
           playerthingy.pos[6] = (playerthingy.pos[6] + 0.02) % (2 * Math.PI)
         } else {
+          console.log("look")
           playerthingy.pos[6] = Math.atan2(mouseY - window.innerHeight / 2, mouseX - window.innerWidth / 2);
         }
         send('shoot', {id: playerid, isFiring: autofire || keys.space || keys.click, angle: playerthingy.pos[6]})
