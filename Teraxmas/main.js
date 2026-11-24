@@ -567,7 +567,7 @@ objects.forEach(o => {
       const radius = o.optional[1] || ((o.pos[0] / o.pos[1]) * 10) || 10;
       if (o.type == "tank") {
         ctx.translate(o.pos[2], o.pos[3]);
-        ctx.rotate(o.angle || 0);
+        ctx.rotate(o.pos[6] || 0);
         
         const turrets = entity.builds[o.optional?.[3] || 'basic']?.[6] || [];
         
