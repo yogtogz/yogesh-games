@@ -262,16 +262,15 @@ function connect() {
     window.socket.addEventListener('close', handleClose);
   });
 }
-
+document.addEventListener('contextmenu', (event) => {
+  event.preventDefault()
+})
+window.addEventListener("mousemove", (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+})
 // Functions
 async function play() {
-  document.addEventListener('contextmenu', (event) => {
-    event.preventDefault()
-  })
-  window.addEventListener("mousemove", (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  });
   loadingScreen(true);
   menu(false);
   window.server = worlds.ffa.server
