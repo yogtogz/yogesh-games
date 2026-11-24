@@ -508,16 +508,16 @@ objects.forEach(o => {
         ctx.stroke();
       
         if (o.name) {
-          ctx.font = 'bold 12px Arial';
+          ctx.font = 'bold 6px Arial';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'bottom';
           ctx.strokeStyle = '#000000';
           ctx.lineWidth = 3;
           ctx.lineJoin = 'round';
-          ctx.strokeText(o.name, o.pos[2], o.pos[3] - radius - 6);
+          ctx.strokeText(o.name, o.pos[2], o.pos[3] - radius - 3);
       
           ctx.fillStyle = '#ffffff';
-          ctx.fillText(o.name, o.pos[2], o.pos[3] - radius - 6);
+          ctx.fillText(o.name, o.pos[2], o.pos[3] - radius - 3);
         }
       }
     }
