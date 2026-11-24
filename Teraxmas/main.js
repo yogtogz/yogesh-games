@@ -1,12 +1,15 @@
 (() => {
-window.socket = null;
+window.socket = null; // hmm.. why is it a window, that's like not even required!!!!!!!!!
 let moveX = 0;
 let moveY = 0;
 let lastMoveX = 0;
 let lastMoveY = 0;
-let worldData;
-let gamemode = "ffa"
-let playerid = "player_object_id_here"
+let mouseX = 0;
+let mouseY = 0;
+let gamemode = "ffa"; // Free For All: Nothing Costs Money For Anyone.
+let playerid = "player_object_id_here"; // Will be randomly generated do not worry guys
+let autospin = false;
+let autofire = false;
 const keys = {"a":false,"b":false,"c":false,"d":false,"e":false,"f":false,"g":false,"h":false,"i":false,"j":false,"k":false,"l":false,"m":false,"n":false,"o":false,"p":false,"q":false,"r":false,"s":false,"t":false,"u":false,"v":false,"w":false,"x":false,"y":false,"z":false,"0":false,"1":false,"2":false,"3":false,"4":false,"5":false,"6":false,"7":false,"8":false,"9":false,"enter":false,"escape":false,"space":false,"backspace":false,"shift":false,"control":false,"alt":false,"arrowup":false,"arrowdown":false,"arrowleft":false,"arrowright":false,"minus":false,"equal":false,"bracketleft":false,"bracketright":false,"backslash":false,"semicolon":false,"quote":false,"comma":false,"period":false,"slash":false,"backquote":false};
 const camera = {
   x: 0,
@@ -15,6 +18,8 @@ const camera = {
 };
 const worldCache = {};
 const baseSpeed = 5;
+// Tanks: TankId: [TankName, TankType, HasAuto, [HealerBody, HealerRate], PlayerSpeed, BodyDamage, Turrets:[[TurretType, TurretRecoil, TurretAngle, TurretX, TurretY, TurretWidth, TurretHeight, BulletDamage, BulletSpeed, BulletScale, IsHealer, HealRate], more_turrets], upgrades: [TankId1, TankId2, TankId3]]
+// Tank Types: Normal, Smasher | Turret Types: Normal
 // Libraries: Shape Player Misc Test
 // Test: Block Circle
 // Test: Include pos:[width and height and x and y and other stuff]
@@ -26,12 +31,13 @@ const baseSpeed = 5;
 // Musc: scale,x,y,shape,damage,vx,vy (v = velocity)
 
 // HOW TO USE pos
-// id,library,type,[width, height, x, y, vx, vy],xp,damage,optional:opt], tag
-// "id": id, "library": lib, "type": ty, "pos": [w,h,x,y,vx,vy], "exp": xp, "damage": dmg, "hp":hp, "optional": opt, "tag":tag, "name": optional_name 
-// opt: [color/hex, radius for circle/tank, collide:[canCollide,BlockOrCircle]]
+// id,library,type,[width, height, x, y, vx, vy, angle],xp,damage,optional:opt], tag
+// "id": id, "library": lib, "type": ty, "pos": [w,h,x,y,vx,vy, angle], "exp": xp, "damage": dmg, "hp":[hp, max], "optional": opt, "tag":tag, "name": optional_name
+// opt: [color/hex, radius for circle/tank, collide:[canCollide,BlockOrCircle], tank, [Body Damage 1-9, Max Health 1-9, Bullet Speed 1-9, Bullet Health 1-9, Bullet Penetration 1-9, Bullet Damage 1-9, Reload 1-9, Move Speed 1-9, Shield Regen 1-9, Shield Capacity 1-9]]
 let objects = [
-  //{"id":"test_id","library":"test", "type":"block", "pos":[50,50,10,10,0,0], "optional":["blue",null,[true,"block"]]}
+  //{"id":"test_id","library":"test", "type":"block", "pos":[50,50,10,10,0,0,0], "optional":["blue",null,[true,"block"]]}
 ]
+let shapes = []
 async function definitionJsonLoader(what) { 
   try {
     if (!what) {
@@ -120,17 +126,19 @@ function packet(data) {
 
   if (data.type === 'state_variable') {
     const serverObjects = data.data.objects || [];
-
+    const serverShapes = data.data.shapes || [];
+  
+    // --- SYNC OBJECTS ---
     // 1. Add new objects or update existing ones
     serverObjects.forEach((serverObj) => {
       const existingObj = objects.find((obj) => obj.id === serverObj.id);
-
+  
       if (existingObj) {
         if (serverObj.id === playerid) {
-          // Only update width [0] and height; keep local x, y, vx, vy [5]
+          // Only update width [0] and height; keep local x, y, vx, vy
           existingObj.pos[0] = serverObj.pos[0];
           existingObj.pos[1] = serverObj.pos[1];
-      
+  
           // Sync server-controlled stats
           existingObj.exp = serverObj.exp;
           existingObj.damage = serverObj.damage;
@@ -144,13 +152,34 @@ function packet(data) {
         objects.push(serverObj);
       }
     });
-
-    // 2. Remove deleted objects in-place (works even if `objects` is declared with `const`)
+  
+    // 2. Remove deleted objects in-place
     for (let i = objects.length - 1; i >= 0; i--) {
       const localObj = objects[i];
       const stillOnServer = serverObjects.some((sObj) => sObj.id === localObj.id);
       if (!stillOnServer) {
         objects.splice(i, 1);
+      }
+    }
+  
+    // --- SYNC SHAPES ---
+    // 1. Add new shapes or update existing ones
+    serverShapes.forEach((serverShape) => {
+      const existingShape = shapes.find((shape) => shape.id === serverShape.id);
+  
+      if (existingShape) {
+        Object.assign(existingShape, serverShape);
+      } else {
+        shapes.push(serverShape);
+      }
+    });
+  
+    // 2. Remove deleted shapes in-place
+    for (let i = shapes.length - 1; i >= 0; i--) {
+      const localShape = shapes[i];
+      const stillOnServer = serverShapes.some((sShape) => sShape.id === localShape.id);
+      if (!stillOnServer) {
+        shapes.splice(i, 1);
       }
     }
   }
@@ -192,6 +221,13 @@ function connect() {
           lastMoveX = moveX;
           lastMoveY = moveY;
         }
+        let playerthingy = objects.find(child => child.type === playerid)
+        if (autospin) {
+          playerthingy.pos[6] = (playerthingy.pos[6] + 0.02) % (2 * Math.PI)
+        } else {
+          playerthingy.pos[6] = Math.atan2(mouseY - window.innerHeight / 2, mouseX - window.innerWidth / 2);
+        }
+        send('shoot', {id: playerid, isFiring: autofire || keys.space || keys.click, angle: playerthingy.pos[6]})
       }, 50);
 
       resolve(true); // Only unblocks `await connect()` AFTER everything above is ready
@@ -227,11 +263,15 @@ function connect() {
   });
 }
 
-//const color = "#e8c764";
-//const border = borderColor(color);
-
 // Functions
 async function play() {
+  document.addEventListener('contextmenu', (event) => {
+    event.preventDefault()
+  })
+window.addEventListener("mousemove", (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
   loadingScreen(true);
   menu(false);
   window.server = worlds.ffa.server
@@ -245,9 +285,9 @@ async function play() {
     loadingScreen(false);
     menu(true);
     alert(loaded)
-    const reload = confirm("Reload page? (May fix error, if it does not, it's probably being fixed right now.)")
+    const reload = confirm("Reload page? (May fix error, if it does not, it's probably being fixed right now)")
     if (!reload) alert("Too bad you gotta reload.");
-    const devkey = prompt("Enter skip reload key to continue (Not reccomended, non devs.)", "Yes please don't read the source code.");
+    const devkey = prompt("Enter skip reload key to continue (Not reccomended, non devs.)", "Yes please don't read the source code");
     if (devkey != "banana") window.location.reload();
   }
 }
@@ -361,7 +401,7 @@ function idGen() {
     }
     return result;
 }
-function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, xp=0, dmg=0, hp=100, opt=["default", null,[false,"block"]], tag=null,id=idGen(), name = "") {
+function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, xp=0, dmg=0, hp=[100,100], opt=["default", null,[false,"block"], null, null], tag=null,id=idGen(), name = "") {
   if (lib == "player") send('player_new', [lib, ty, w, h, x, y, vx, vy, xp, dmg, hp, opt, tag, id, name])
 }
 async function renderGame(what) {
@@ -371,7 +411,7 @@ async function renderGame(what) {
     ? window.entity.player.tank.color 
     : "#3ca4cb";
     playerid = idGen()
-    summonObject("player","tank", 0, 0, Math.random() * worldCache[gamemode].width, Math.random() * worldCache[gamemode].height, 0, 0, 100, 100, 100, [tankColor, 10], "player", playerid, (document.getElementById('name').value.trim() !== "" ?  document.getElementById('name').value : "Nameless Tank"))
+    summonObject("player","tank", 0, 0, Math.random() * worldCache[gamemode].width, Math.random() * worldCache[gamemode].height, 0, 0, 100, 100, [100, 100], [tankColor, 10, [true, "block"], "basic", [0,0,0,0,0,0,0,0,0,0]], "player", playerid, (document.getElementById('name').value.trim() !== "" ?  document.getElementById('name').value : "Nameless Tank"))
     requestAnimationFrame(loop);
     handleKeys(); // Handle key presses
     ui.style.display = "block";
@@ -384,10 +424,31 @@ async function renderGame(what) {
 function handleKeys() {
   window.addEventListener("keydown", (e) => {
     keys[e.key.toLowerCase()] = true;
-  });
+    if (e.key.toLowerCase() === 'e') {
+      autofire = !autofire
+    }
+    if (e.key.toLowerCase() === 'c' {
+      autospin = !autospin
+    }
+  })
   window.addEventListener("keyup", (e) => {
     keys[e.key.toLowerCase()] = false;
-  });
+  })
+  document.addEventListener("mousedown", (e) => {
+  if (e.button === 0) {
+    keys.click = true
+  } else if (e.button === 2) {
+    keys.rightclick = true
+  }
+})
+document.addEventListener("mouseup", (e) => {
+  if (e.button === 0) {
+    keys.click = false
+  } else if (e.button === 2) {
+    keys.rightclick = false
+  }
+})
+
 }
 // Robot Function
 function scoreCalc(totalScore) {
@@ -508,20 +569,33 @@ objects.forEach(o => {
         ctx.strokeStyle = borderColor(o.optional[0]);
         ctx.lineWidth = 1;
         ctx.stroke();
-      
-        if (o.name) {
-          ctx.font = 'bold 6px Arial';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'bottom';
-          ctx.strokeStyle = '#000000';
-          ctx.lineWidth = 3;
-          ctx.lineJoin = 'round';
-          ctx.strokeText(o.name, o.pos[2], o.pos[3] - radius - 3);
-      
-          ctx.fillStyle = '#ffffff';
-          ctx.fillText(o.name, o.pos[2], o.pos[3] - radius - 3);
-        }
       }
+      if (o.name) {
+        ctx.font = 'bold 6px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 3;
+        ctx.lineJoin = 'round';
+        ctx.strokeText(o.name, o.pos[2], o.pos[3] - radius - 3);
+    
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(o.name, o.pos[2], o.pos[3] - radius - 3);
+      }
+      ctx.translate(o.pos[2], o.pos[3]);
+      ctx.rotate(o.angle || 0);
+    
+      const rectLength = radius * 1.8;
+      const rectWidth = radius * 0.8;
+    
+      ctx.fillStyle = '#999999';
+      ctx.strokeStyle = borderColor('#999999');
+      ctx.lineWidth = 2;
+    
+      ctx.beginPath();
+      ctx.rect(0, -rectWidth / 2, rectLength, rectWidth);
+      ctx.fill();
+      ctx.stroke();
     } else if (o.library == "wall") {
       if (o.type == "wall") {
         if (o.optional[3][2] == 'circle') {
@@ -570,10 +644,37 @@ objects.forEach(o => {
         ctx.lineWidth = 4;
         ctx.stroke();
       }
+    } else if(o.library == "bullet") {
+      ctx.fillStyle = o.optional[0];
+        ctx.beginPath();
+        ctx.arc(o.pos[2], o.pos[3], o.optional[1] || ((o.pos[0] / o.pos[1]) * 10), 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.strokeStyle = borderColor(o.optional[0]);
+        ctx.lineWidth = 1;
+        ctx.stroke();
     }
     o.pos[2] += o.pos[4]
     o.pos[3] += o.pos[5]
 })
+  shapes.forEach((s) => {
+    const shape = entity.shapes.find(child => child.type === s.type);
+    for (let i = 0; i < sides; i++) {
+      const angle = i * (Math.PI * 2) / Number(shape.sides);
+      const x = centerX + radius * Math.cos(angle);
+      const y = centerY + radius * Math.sin(angle);
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    }
+    ctx.closePath();
+    ctx.fillStyle = shape.color;
+    ctx.fill();
+    ctx.strokeStyle = borderColor(shape.color);
+    ctx.lineWidth = 5;
+    ctx.stroke();
+  });
   ctx.restore();
     // time to make myself an xp bar (robotless, but tutorialful)
   const xpsize = { "x": window.innerWidth / 3, "y": window.innerHeight / 20 }
