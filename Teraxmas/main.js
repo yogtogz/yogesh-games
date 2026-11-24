@@ -222,6 +222,7 @@ function connect() {
           lastMoveY = moveY;
         }
         let playerthingy = objects.find(child => child.id === playerid)
+        console.log(playerthingy)
         if (Array.isArray(playerthingy?.pos) && playerthingy.pos.length === 7) {
         if (autospin) {
           playerthingy.pos[6] = (playerthingy.pos[6] + 0.02) % (2 * Math.PI)
