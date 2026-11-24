@@ -10,6 +10,8 @@ let gamemode = "ffa"; // Free For All: Nothing Costs Money For Anyone.
 let playerid = "player_object_id_here"; // Will be randomly generated do not worry guys
 let autospin = false;
 let autofire = false;
+let isFiring = false;
+let wasFiring = false;
 const keys = {"a":false,"b":false,"c":false,"d":false,"e":false,"f":false,"g":false,"h":false,"i":false,"j":false,"k":false,"l":false,"m":false,"n":false,"o":false,"p":false,"q":false,"r":false,"s":false,"t":false,"u":false,"v":false,"w":false,"x":false,"y":false,"z":false,"0":false,"1":false,"2":false,"3":false,"4":false,"5":false,"6":false,"7":false,"8":false,"9":false,"enter":false,"escape":false,"space":false,"backspace":false,"shift":false,"control":false,"alt":false,"arrowup":false,"arrowdown":false,"arrowleft":false,"arrowright":false,"minus":false,"equal":false,"bracketleft":false,"bracketright":false,"backslash":false,"semicolon":false,"quote":false,"comma":false,"period":false,"slash":false,"backquote":false};
 const camera = {
   x: 0,
@@ -212,10 +214,9 @@ function connect() {
     const handleOpen = () => {
       console.log('Connected to WSS server');
       window.socket.send(JSON.stringify({ type: 'greeting', data: { connected: true } }));
-      send('state', {});
+      send('state', {id: playerid, angle: 0});
 
       window.stateInterval = setInterval(() => {
-        send('state', {});
         if (moveX !== 0 || moveY !== 0 || lastMoveX !== 0 || lastMoveY !== 0) {
           send('move', { id: playerid, x: moveX, y: moveY, collide: true });
           lastMoveX = moveX;
@@ -231,7 +232,10 @@ function connect() {
           console.log("look")
           playerthingy.pos[6] = Math.atan2(mouseY - window.innerHeight / 2, mouseX - window.innerWidth / 2);
         }
-        send('shoot', {id: playerid, isFiring: autofire || keys.space || keys.click, angle: playerthingy.pos[6]})
+        send('state', { id: playerid, angle: playerthingy.pos[6] });
+        wasFiring = isFiring
+        isFiring = Boolean(autofire || keys.space || keys.click);
+        if (isFiring != wasFiring) send('shoot', {id: playerid, isFiring: isFiring, angle: playerthingy.pos[6]});
         }
       }, 50);
 
