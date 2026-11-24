@@ -723,4 +723,5 @@ window.onwheel = function(event) {
     camera.zoom = Math.min(50, camera.zoom + 0.1);
   }
 };
+document.getElementById('play').addEventListener('click', play);
 })()
