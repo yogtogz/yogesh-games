@@ -369,7 +369,7 @@ async function renderGame(what) {
     ? window.entity.player.tank.color 
     : "#3ca4cb";
     playerid = idGen()
-    summonObject("player","tank", 0, 0, Math.random() * worlds[gamemode].width, Math.random() * worlds[gamemode].height, 0, 0, 100, 100, 100, [tankColor, 10], "player", playerid, document.getElementById('name').value)
+    summonObject("player","tank", 0, 0, Math.random() * worlds[gamemode].width, Math.random() * worlds[gamemode].height, 0, 0, 100, 100, 100, [tankColor, 10], "player", playerid, document.getElementById('name').value || "Nameless Tank")
     requestAnimationFrame(loop);
     handleKeys(); // Handle key presses
     ui.style.display = "block";
@@ -501,7 +501,7 @@ objects.forEach(o => {
         const radius = o.optional[1] || ((o.pos / o.pos) * 10);
         ctx.fillStyle = o.optional[0];
         ctx.beginPath();
-        ctx.arc(o.pos, o.pos, radius, 0, 2 * Math.PI);
+        ctx.arc(o.pos[2], o.pos[3], radius, 0, 2 * Math.PI);
         ctx.fill();
         ctx.strokeStyle = borderColor(o.optional[0]);
         ctx.lineWidth = 1;
@@ -527,13 +527,14 @@ objects.forEach(o => {
   ctx.restore();
     // time to make myself an xp bar (robotless, but tutorialful)
   const xpsize = { "x": window.innerWidth / 3, "y": window.innerHeight / 20 }
-  const xploc = { "x": (window.innerWidth / 2) - xpsize.x, "y": window.innerHeight - xpsize.y }
+  const xploc = { "x": (window.innerWidth / 2) - (xpsize.x / 2), "y": window.innerHeight - xpsize.y - 10 };
   ctx.beginPath();
   ctx.fillStyle = '#aeaeae'; // AEiou.
   ctx.strokeStyle = '#0c0c0c'; // 0c0c0c0c0c0c0c0c0c0c0c0c....
   ctx.lineWidth = 6; // hopefully... this is good.
   ctx.roundRect(xploc.x, xploc.y, xpsize.x, xpsize.y, 20);
   ctx.fill();
+  ctx.stroke();
   
   const calcName = {"x": window.innerWidth / 2, "y": xploc.y - 12}
   const calcScore = {"x": window.innerWidth / 2, "y": xploc.y + (xpsize.y / 2)}
@@ -544,11 +545,11 @@ objects.forEach(o => {
   ctx.strokeStyle = 'black';
   ctx.lineWidth = 6;
   ctx.lineJoin = 'round';
-  ctx.strokeText(playername, calcName.x, calcName.y);
+  ctx.strokeText(playername || "A Strange Player", calcName.x, calcName.y);
   ctx.fillStyle = 'white';
-  ctx.fillText(playername, calcName.x, calcName.y);
-  ctx.strokeText(scoreCalc(playerxp).level, calcScore.x, calcScore.y);
-  ctx.fillText(scoreCalc(playerxp).level, calcScore.x, calcScore.y);
+  ctx.fillText(playername || "A Strange Player", calcName.x, calcName.y);
+  ctx.strokeText("Level " + String(scoreCalc(playerxp).level), calcScore.x, calcScore.y);
+  ctx.fillText("Level " + String(scoreCalc(playerxp).level), calcScore.x, calcScore.y);
   ctx.fill();
   
   ctx.beginPath();
