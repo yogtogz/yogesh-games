@@ -214,7 +214,7 @@ function connect() {
     const handleOpen = () => {
       console.log('Connected to WSS server');
       window.socket.send(JSON.stringify({ type: 'greeting', data: { connected: true } }));
-      send('state', {id: playerid, angle: 0});
+      send('state', {first: true});
 
       window.stateInterval = setInterval(() => {
         if (moveX !== 0 || moveY !== 0 || lastMoveX !== 0 || lastMoveY !== 0) {
