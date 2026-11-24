@@ -422,8 +422,10 @@ function renderCanvas() {
   canvas.width = window.innerWidth * dpr;
   canvas.height = window.innerHeight * dpr;
   ctx.scale(dpr, dpr);
+  let playername;
+  let playerxp;
 
-//ctx.setTransform(1, 0, 0, 1, 0, 0); 
+ctx.setTransform(1, 0, 0, 1, 0, 0); 
 ctx.clearRect(0, 0, canvas.width, canvas.height);
 // Math and Rendering? Me, A Dummy? In Javascript? Robot Time.
 let player = objects.find(o => o.id === playerid);
@@ -458,15 +460,6 @@ let player = objects.find(o => o.id === playerid);
     ctx.lineTo(currentWorld.width, y);
     ctx.stroke();
   }
-  // time to make myself an xp bar (robotless, but tutorialful)
-  const xpsize = { "x": window.innerWidth / 3, "y": window.innerHeight / 20 }
-  const xploc = { "x": (window.innerWidth / 2) - xpsize.x, "y": window.innerHeight - xpsize.y }
-  ctx.beginPath();
-  ctx.roundRect(xploc.x, xploc.y, xpsize.x, xpsize.y, 20);
-  ctx.fillStyle = '#aeaeae'; // AEiou.
-  ctx.strokeStyle = '#0c0c0c'; // 0c0c0c0c0c0c0c0c0c0c0c0c....
-  ctx.lineWidth = 6; // hopefully... this is good.
-  ctx.fill();
 objects.forEach(o => {
     if (o.id == playerid) {
   moveX = 0;
@@ -483,30 +476,8 @@ objects.forEach(o => {
   o.pos[4] = moveX * baseSpeed;
   o.pos[5] = moveY * baseSpeed;
 
-  
-  const calcName = {"x": window.innerWidth / 2, "y": xploc.y - 12}
-  ctx.font = 'Bold 24px Arial';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.strokeStyle = 'black';
-  ctx.lineWidth = 6;
-  ctx.lineJoin = 'round';
-  ctx.strokeText(o.name, calcName.x, calcName.y);
-  ctx.fillStyle = 'white';
-  ctx.fillText(o.name, calcName.x, calcName.y);
-      
-  const calcScore = {"x": window.innerWidth / 2, "y": xploc.y + (xpsize.y / 2)}
-  ctx.font = 'Bold 24px Arial';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.strokeStyle = 'black';
-  ctx.lineWidth = 6;
-  ctx.lineJoin = 'round';
-  ctx.strokeText(scoreCalc(o.exp).level, calcScore.x, calcScore.y);
-  ctx.fillStyle = 'white';
-  ctx.fillText(scoreCalc(o.exp).level, calcScore.x, calcScore.y);
-  ctx.beginPath();
-  ctx.roundRect(xploc.x, xploc.y, scoreCalc(o.exp).score / xpsize.x, xpsize.y)
+  playername = o.name
+  playerxp = o.exp
 }
     if (o.library == "test") {
       if (o.type == "block") {
@@ -554,6 +525,39 @@ objects.forEach(o => {
     o.pos[3] += o.pos[5]
 })
   ctx.restore();
+    // time to make myself an xp bar (robotless, but tutorialful)
+  const xpsize = { "x": window.innerWidth / 3, "y": window.innerHeight / 20 }
+  const xploc = { "x": (window.innerWidth / 2) - xpsize.x, "y": window.innerHeight - xpsize.y }
+  ctx.beginPath();
+  ctx.roundRect(xploc.x, xploc.y, xpsize.x, xpsize.y, 20);
+  ctx.fillStyle = '#aeaeae'; // AEiou.
+  ctx.strokeStyle = '#0c0c0c'; // 0c0c0c0c0c0c0c0c0c0c0c0c....
+  ctx.lineWidth = 6; // hopefully... this is good.
+  
+  const calcName = {"x": window.innerWidth / 2, "y": xploc.y - 12}
+  ctx.font = 'Bold 24px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.strokeStyle = 'black';
+  ctx.lineWidth = 6;
+  ctx.lineJoin = 'round';
+  ctx.strokeText(playername, calcName.x, calcName.y);
+  ctx.fillStyle = 'white';
+  ctx.fillText(playername, calcName.x, calcName.y);
+      
+  const calcScore = {"x": window.innerWidth / 2, "y": xploc.y + (xpsize.y / 2)}
+  ctx.font = 'Bold 24px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.strokeStyle = 'black';
+  ctx.lineWidth = 6;
+  ctx.lineJoin = 'round';
+  ctx.strokeText(scoreCalc(playerxp).level, calcScore.x, calcScore.y);
+  ctx.fillStyle = 'white';
+  ctx.fillText(scoreCalc(playerxp).level, calcScore.x, calcScore.y);
+  ctx.beginPath();
+  ctx.roundRect(xploc.x, xploc.y, scoreCalc(o.exp).score / xpsize.x, xpsize.y);
+  ctx.fill();
 }
 function loop(currentTime) {
   requestAnimationFrame(loop);
