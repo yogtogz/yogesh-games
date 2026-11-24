@@ -268,10 +268,10 @@ async function play() {
   document.addEventListener('contextmenu', (event) => {
     event.preventDefault()
   })
-window.addEventListener("mousemove", (e) => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-});
+  window.addEventListener("mousemove", (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
   loadingScreen(true);
   menu(false);
   window.server = worlds.ffa.server
@@ -724,4 +724,7 @@ window.onwheel = function(event) {
     camera.zoom = Math.min(50, camera.zoom + 0.1);
   }
 };
+document.getElementById('play').addEventListener("click", () => {
+  play();
+});
 })
