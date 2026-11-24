@@ -222,7 +222,7 @@ function connect() {
           lastMoveY = moveY;
         }
         let playerthingy = objects.find(child => child.id === playerid)
-        if (plaerthingy?.pos) {
+        if (playerthingy?.pos) {
           console.log(playerthingy.pos[6])
         if (autospin) {
           console.log("spin")
