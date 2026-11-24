@@ -213,8 +213,7 @@ function connect() {
 
     const handleOpen = () => {
       console.log('Connected to WSS server');
-      window.socket.send(JSON.stringify({ type: 'greeting', data: { connected: true } }));
-      send('state', {first: true});
+      window.socket.send(JSON.stringify({ type: 'greeting', data: { connected: true } }))
 
       window.stateInterval = setInterval(() => {
         if (moveX !== 0 || moveY !== 0 || lastMoveX !== 0 || lastMoveY !== 0) {
