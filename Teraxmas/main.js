@@ -547,67 +547,59 @@ objects.forEach(o => {
         ctx.lineWidth = 1;
         ctx.stroke();
       }
-    } else if (o.library == "player") {
-      const radius = o.optional[1] || ((o.pos[0] / o.pos[1]) * 10) || 10;
-      if (o.type == "tank") {
-        const targetAngle = o.pos[6] || 0;
-        if (o.id === playerid || typeof o.renderAngle !== 'number') {
-          o.renderAngle = targetAngle;
-        } else {
-          let diff = ((targetAngle - o.renderAngle + Math.PI) % (Math.PI * 2)) - Math.PI;
-          if (diff < -Math.PI) diff += Math.PI * 2;
-          o.renderAngle += diff * 0.25;
-        }
-        ctx.translate(o.pos[2], o.pos[3]);
-        ctx.rotate(o.pos[6] || 0);
-        
-        const turrets = entity.builds[o.optional?.[3] || 'basic']?.[6] || [];
-        
-        ctx.fillStyle = '#999999';
-        ctx.strokeStyle = borderColor('#999999');
-        ctx.lineWidth = 2;
-        
-        for (const t of turrets) {
-          const rad = (t[2] * Math.PI) / 180;
-          ctx.rotate(rad);
-        
-          ctx.beginPath();
-          ctx.rect(t[4], t[3] - t[5] / 2, t[6], t[5]);
+        } else if (o.library == "player") {
+        const radius = o.optional[1] || ((o.pos[0] / o.pos[1]) * 10) || 10
+        if (o.type == "tank") {
+          const targetAngle = o.pos[6] || 0;
+          if (o.id === playerid || typeof o.renderAngle !== 'number') {
+            o.renderAngle = targetAngle
+          } else {
+            let diff = ((targetAngle - o.renderAngle + Math.PI) % (Math.PI * 2)) - Math.PI;
+            if (diff < -Math.PI) diff += Math.PI * 2;
+            o.renderAngle += diff * 0.25
+          }
+  
+          ctx.translate(o.pos[2], o.pos[3])
+          ctx.rotate(o.renderAngle)
+          const turrets = entity.builds[o.optional?.[3] || 'basic']?.[6] || [];
+          ctx.fillStyle = '#999999';
+          ctx.strokeStyle = borderColor('#999999');
+          ctx.lineWidth = 2;
+  
+          for (const t of turrets) {
+            const rad = (t[2] * Math.PI) / 180;
+            ctx.rotate(rad);
+            ctx.beginPath();
+            ctx.rect(t[4], t[3] - t[5] / 2, t[6], t[5]);
+            ctx.fill();
+            ctx.stroke();
+            ctx.rotate(-rad);
+          }
+          ctx.beginPath()
+          ctx.arc(0, 0, radius, 0, Math.PI * 2)
+          ctx.fillStyle = o.optional?.[0] || '#00b2e1';
           ctx.fill();
+          ctx.strokeStyle = borderColor(o.optional?.[0] || '#00b2e1');
+          ctx.lineWidth = 1;
           ctx.stroke();
-        
-          ctx.rotate(-rad);
+  
+          ctx.rotate(-o.renderAngle)
+  
+          if (o.name) {
+            ctx.font = 'bold 6px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
+            ctx.lineJoin = 'round';
+            ctx.strokeText(o.name, 0, -radius - 3);
+  
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(o.name, 0, -radius - 3);
+          }
+  
+          ctx.translate(-o.pos[2], -o.pos[3]);
         }
-        ctx.rotate(-(o.pos || 0));
-        ctx.translate(-o.pos, -o.pos);
-        ctx.beginPath();
-        ctx.arc(0, 0, radius, 0, Math.PI * 2);
-        ctx.fillStyle = o.optional?.[0] || '#00b2e1';
-        ctx.fill();
-        ctx.strokeStyle = borderColor(o.optional?.[0] || '#00b2e1');
-        ctx.stroke();
-
-        ctx.fillStyle = o.optional[0];
-        ctx.beginPath();
-        ctx.arc(o.pos[2], o.pos[3], radius, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.strokeStyle = borderColor(o.optional[0]);
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-      ctx.rotate(-o.renderAngle);
-      if (o.name) {
-        ctx.font = 'bold 6px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 3;
-        ctx.lineJoin = 'round';
-        ctx.strokeText(o.name, o.pos[2], o.pos[3] - radius - 3);
-    
-        ctx.fillStyle = '#ffffff';
-        ctx.fillText(o.name, o.pos[2], o.pos[3] - radius - 3);
-      }
     } else if (o.library == "wall") {
       if (o.type == "wall") {
         if (o.optional[3][2] == 'circle') {
