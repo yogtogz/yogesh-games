@@ -141,6 +141,8 @@ function packet(data) {
         if (isObjects && sItem.id === playerid) {
           existing.pos[0] = sItem.pos[0];
           existing.pos[1] = sItem.pos[1];
+          existing.pos[2] += (serverObj.pos[2] - existing.pos[2]) * 0.35;
+          existing.pos[3] += (serverObj.pos[3] - existing.pos[3]) * 0.35;
           existing.renderAngle = existing.pos[6] || 0;
           const { pos, ...serverStats } = sItem;
           Object.assign(existing, serverStats);
@@ -513,23 +515,26 @@ let player = objects.find(o => o.id === playerid);
   }
 objects.forEach(o => {
     if (o.id == playerid) {
-  moveX = 0;
-  moveY = 0;
-  if (keys["d"]) moveX += 1;
-  if (keys["a"]) moveX -= 1;
-  if (keys["s"]) moveY += 1;
-  if (keys["w"]) moveY -= 1;
-  let length = Math.sqrt(moveX * moveX + moveY * moveY);
-  if (length > 0) {
-      moveX /= length;
-      moveY /= length;
-  }
-  o.pos[4] = moveX * baseSpeed;
-  o.pos[5] = moveY * baseSpeed;
+      moveX = 0;
+      moveY = 0;
+      if (keys["d"]) moveX += 1;
+      if (keys["a"]) moveX -= 1;
+      if (keys["s"]) moveY += 1;
+      if (keys["w"]) moveY -= 1;
+      let length = Math.sqrt(moveX * moveX + moveY * moveY);
+      if (length > 0) {
+        moveX /= length;
+        moveY /= length;
+      }
+      const diameter = ((o.pos[0] + o.pos[1]) / 2) || (o.optional[1] * 2) || 20;
+      const clientSpeed = (baseSpeed * (50 / diameter) * (o.speedMult || 1)) / 3;
+      o.pos[4] = moveX * clientSpeed;
+      o.pos[5] = moveY * clientSpeed;
 
-  playername = o.name
-  playerxp = o.exp
-}
+      playername = o.name;
+      playerxp = o.exp;
+    }
+
     if (o.library == "test") {
       if (o.type == "block") {
         ctx.fillStyle = o.optional[0];
