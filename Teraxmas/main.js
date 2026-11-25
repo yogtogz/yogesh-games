@@ -141,8 +141,8 @@ function packet(data) {
         if (isObjects && sItem.id === playerid) {
           existing.pos[0] = sItem.pos[0];
           existing.pos[1] = sItem.pos[1];
-          existing.pos[2] += (serverObj.pos[2] - existing.pos[2]) * 0.35;
-          existing.pos[3] += (serverObj.pos[3] - existing.pos[3]) * 0.35;
+          existing.pos[2] += (sItem.pos[2] - existing.pos[2]) * 0.35;
+          existing.pos[3] += (sItem.pos[3] - existing.pos[3]) * 0.35;
           existing.renderAngle = existing.pos[6] || 0;
           const { pos, ...serverStats } = sItem;
           Object.assign(existing, serverStats);
