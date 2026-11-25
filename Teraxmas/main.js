@@ -226,8 +226,8 @@ function connect() {
         if (autospin) {
           playerthingy.pos[6] = (playerthingy.pos[6] + 0.03) % (2 * Math.PI)
         } else {
-          const screenX = window.innerWidth / 2 + (playerthingy.pos - camera.x);
-          const screenY = window.innerHeight / 2 + (playerthingy.pos - camera.y);
+          const screenX = window.innerWidth / 2 + (playerthingy.pos[2] - camera.x);
+          const screenY = window.innerHeight / 2 + (playerthingy.pos[3] - camera.y);
           playerthingy.pos[6] = Math.atan2(mouseY - screenY, mouseX - screenX);
         }
         wasFiring = isFiring
