@@ -141,8 +141,10 @@ function packet(data) {
         if (isObjects && sItem.id === playerid) {
           existing.pos[0] = sItem.pos[0];
           existing.pos[1] = sItem.pos[1];
-          existing.pos[2] += (sItem.pos[2] - existing.pos[2]) * 0.35;
-          existing.pos[3] += (sItem.pos[3] - existing.pos[3]) * 0.35;
+          if (Math.hypot(sItem.pos - existing.pos, sItem.pos - existing.pos) > 40) {
+            existing.pos[2] += (sItem.pos[2] - existing.pos[2]) * 0.35;
+            existing.pos[3] += (sItem.pos[3] - existing.pos[3]) * 0.35;
+          }
           existing.renderAngle = existing.pos[6] || 0;
           const { pos, ...serverStats } = sItem;
           Object.assign(existing, serverStats);
@@ -662,8 +664,13 @@ objects.forEach(o => {
         ctx.lineWidth = 1;
         ctx.stroke();
     }
+  if (o.id === playerid) {
     o.pos[2] += o.pos[4]
     o.pos[3] += o.pos[5]
+  } else {
+    o.pos[2] += o.pos[4] / 3
+    o.pos[3] += o.pos[5] / 3
+  }
 })
   shapes.forEach((s) => {
     const shape = entity.shapes.find(child => child.type === s.type);
