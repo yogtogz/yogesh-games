@@ -198,7 +198,6 @@ function connect() {
         }
         let playerthingy = objects.find(child => child.id === playerid)
         if (playerthingy?.pos) {
-          console.log(playerthingy.pos[6])
         if (autospin) {
           playerthingy.pos[6] = (playerthingy.pos[6] + 0.03) % (2 * Math.PI)
         } else {
