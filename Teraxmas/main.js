@@ -124,67 +124,43 @@ function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
 // robot. I hate using robot bro I keep getting errors from it I would have probably done better myself
 // take this as a lesson, devtool lurkers.
 function packet(data) {
-  if (!data || typeof data !== 'object') return;
+  if (data?.type !== 'state_variable') return;
 
-  if (data.type === 'state_variable') {
-    const serverObjects = data.data.objects || [];
-    const serverShapes = data.data.shapes || [];
-    // --- SYNC OBJECTS ---
-    // 1. Add new objects or update existing ones
-    serverObjects.forEach((serverObj) => {
-      const existingObj = objects.find((obj) => obj.id === serverObj.id);
-  
-      if (existingObj) {
-        if (serverObj.id === playerid) {
-          // Only update width [0] and height; keep local x, y, vx, vy
-          existingObj.pos[0] = serverObj.pos[0];
-          existingObj.pos[1] = serverObj.pos[1];
-  
-          // Sync server-controlled stats
-          existingObj.exp = serverObj.exp;
-          existingObj.damage = serverObj.damage;
-          existingObj.hp = serverObj.hp;
-          existingObj.optional = serverObj.optional;
-          existingObj.tag = serverObj.tag;
+  for (const [localList, serverList, isObjects] of [
+    [objects, data.data.objects || [], true],
+    [shapes, data.data.shapes || [], false]
+  ]) {
+    const localMap = new Map(localList.map(item => [item.id, item]));
+    const serverIds = new Set();
+
+    for (const sItem of serverList) {
+      serverIds.add(sItem.id);
+      const existing = localMap.get(sItem.id);
+
+      if (existing) {
+        if (isObjects && sItem.id === playerid) {
+          existing.pos[0] = sItem.pos[0];
+          existing.pos[1] = sItem.pos[1];
+          existing.renderAngle = existing.pos[6] || 0;
+          const { pos, ...serverStats } = sItem;
+          Object.assign(existing, serverStats);
         } else {
-          Object.assign(existingObj, serverObj);
+          const prevRenderAngle = existing.renderAngle ?? existing.pos?.[6] ?? 0;
+          Object.assign(existing, sItem);
+          if (isObjects) existing.renderAngle = prevRenderAngle;
         }
       } else {
-        objects.push(serverObj);
-      }
-    });
-  
-    // 2. Remove deleted objects in-place
-    for (let i = objects.length - 1; i >= 0; i--) {
-      const localObj = objects[i];
-      const stillOnServer = serverObjects.some((sObj) => sObj.id === localObj.id);
-      if (!stillOnServer) {
-        objects.splice(i, 1);
+        if (isObjects && Array.isArray(sItem.pos)) sItem.renderAngle = sItem.pos[6] || 0;
+        localList.push(sItem);
       }
     }
-  
-    // --- SYNC SHAPES ---
-    // 1. Add new shapes or update existing ones
-    serverShapes.forEach((serverShape) => {
-      const existingShape = shapes.find((shape) => shape.id === serverShape.id);
-  
-      if (existingShape) {
-        Object.assign(existingShape, serverShape);
-      } else {
-        shapes.push(serverShape);
-      }
-    });
-  
-    // 2. Remove deleted shapes in-place
-    for (let i = shapes.length - 1; i >= 0; i--) {
-      const localShape = shapes[i];
-      const stillOnServer = serverShapes.some((sShape) => sShape.id === localShape.id);
-      if (!stillOnServer) {
-        shapes.splice(i, 1);
-      }
+
+    for (let i = localList.length - 1; i >= 0; i--) {
+      if (!serverIds.has(localList[i].id)) localList.splice(i, 1);
     }
   }
 }
+
 // self
 function send(type, data) {
   if (!socket || socket.readyState !== 1) return;
@@ -479,6 +455,12 @@ function scoreCalc(totalScore) {
     score: score
   };
 }
+function lerpAngle(current, target, t) {
+  let diff = ((target - current + Math.PI) % (Math.PI * 2)) - Math.PI;
+  if (diff < -Math.PI) diff += Math.PI * 2;
+  return current + diff * t;
+}
+
 let lastTime = 0;
 // W w3schools for the tutorial stuff
 function renderCanvas() {
@@ -569,6 +551,14 @@ objects.forEach(o => {
     } else if (o.library == "player") {
       const radius = o.optional[1] || ((o.pos[0] / o.pos[1]) * 10) || 10;
       if (o.type == "tank") {
+        const targetAngle = o.pos[6] || 0;
+        if (o.id === playerid || typeof o.renderAngle !== 'number') {
+          o.renderAngle = targetAngle;
+        } else {
+          let diff = ((targetAngle - o.renderAngle + Math.PI) % (Math.PI * 2)) - Math.PI;
+          if (diff < -Math.PI) diff += Math.PI * 2;
+          o.renderAngle += diff * 0.25;
+        }
         ctx.translate(o.pos[2], o.pos[3]);
         ctx.rotate(o.pos[6] || 0);
         
