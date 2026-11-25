@@ -595,6 +595,7 @@ objects.forEach(o => {
         ctx.lineWidth = 1;
         ctx.stroke();
       }
+      ctx.rotate(-o.renderAngle);
       if (o.name) {
         ctx.font = 'bold 6px Arial';
         ctx.textAlign = 'center';
