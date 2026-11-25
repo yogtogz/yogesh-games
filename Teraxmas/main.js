@@ -666,6 +666,8 @@ objects.forEach(o => {
     }
     o.pos[2] += o.pos[4]
     o.pos[3] += o.pos[5]
+  ctx.rotate(-o.renderAngle);
+ctx.translate(-o.pos, -o.pos);
 })
   shapes.forEach((s) => {
     const shape = entity.shapes.find(child => child.type === s.type);
