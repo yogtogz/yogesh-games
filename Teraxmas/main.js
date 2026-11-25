@@ -228,7 +228,7 @@ function connect() {
         } else {
           const screenX = window.innerWidth / 2 + (playerthingy.pos - camera.x);
           const screenY = window.innerHeight / 2 + (playerthingy.pos - camera.y);
-          playerthingy.pos = Math.atan2(mouseY - screenY, mouseX - screenX);
+          playerthingy.pos[6] = Math.atan2(mouseY - screenY, mouseX - screenX);
         }
         wasFiring = isFiring
         isFiring = Boolean(autofire || keys.space || keys.click);
