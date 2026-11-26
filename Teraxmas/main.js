@@ -264,7 +264,13 @@ document.addEventListener('contextmenu', (event) => {
 window.addEventListener("mousemove", (e) => {
   mouseX = e.clientX;
   mouseY = e.clientY;
-})
+  const me = objects.find(o => o.id === playerid);
+  if (me?.pos && !autospin) {
+    const screenX = window.innerWidth / 2 + ((me.renderX ?? me.pos[2]) - camera.x) * camera.zoom;
+    const screenY = window.innerHeight / 2 + ((me.renderY ?? me.pos[3]) - camera.y) * camera.zoom;
+    me.pos[6] = Math.atan2(mouseY - screenY, mouseX - screenX);
+  }
+});
 // Functions
 async function play() {
   loadingScreen(true);
@@ -528,8 +534,9 @@ let player = objects.find(o => o.id === playerid);
   }
 objects.forEach(o => {
     if (o.id == playerid) {
-      o.renderX = (typeof o.renderX === 'number') ? o.renderX + ((o.pos ? o.pos[2] : 0) - o.renderX) * 0.3 : (o.pos ? o.pos[2] : 0);
-      o.renderY = (typeof o.renderY === 'number') ? o.renderY + ((o.pos ? o.pos[3] : 0) - o.renderY) * 0.3 : (o.pos ? o.pos[3] : 0)
+      o.renderX = (typeof o.renderX === 'number') ? o.renderX + (o.pos ? o.pos[4] : 0) + ((o.pos ? o.pos[2] : 0) - o.renderX) * 0.3 : (o.pos ? o.pos[2] : 0);
+      o.renderY = (typeof o.renderY === 'number') ? o.renderY + (o.pos ? o.pos[5] : 0) + ((o.pos ? o.pos[3] : 0) - o.renderY) * 0.3 : (o.pos ? o.pos[3] : 0);
+
       moveX = 0;
       moveY = 0;
       if (keys["d"]) moveX += 1;
