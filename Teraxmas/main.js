@@ -18,7 +18,7 @@ const camera = {
   y: 0,
   zoom:1.5
 };
-const worldCache = {};
+const worldCache = {"width": 5000, "height": 5000};
 const baseSpeed = 5;
 // Tanks: TankId: [TankName, TankType, HasAuto, [HealerBody, HealerRate], PlayerSpeed, BodyDamage, Turrets:[[TurretType, TurretRecoil, TurretAngle, TurretX, TurretY, TurretWidth, TurretHeight, BulletDamage, BulletSpeed, BulletScale, IsHealer, HealRate], more_turrets], upgrades: [TankId1, TankId2, TankId3]]
 // Tank Types: Normal, Smasher | Turret Types: Normal
@@ -502,7 +502,7 @@ let player = objects.find(o => o.id === playerid);
   ctx.save();
   ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
   ctx.scale(camera.zoom, camera.zoom);
-  ctx.translate(-player.renderX, -player.renderY);
+  ctx.translate(Number.isFinite(-player.renderX) ? -player.renderX : 0, Number.isFinite(-player.renderY) ? -player.renderY : 0);
   let currentWorld = worldCache[gamemode] ? worldCache[gamemode] : (worlds && worldCache[gamemode] ? worldCache[gamemode] : { width: 1000, height: 1000 });
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, currentWorld.width, currentWorld.height);
