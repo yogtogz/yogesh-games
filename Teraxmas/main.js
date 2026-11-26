@@ -214,10 +214,6 @@ function connect() {
         if (playerthingy?.pos) {
         if (autospin) {
           playerthingy.pos[6] = (playerthingy.pos[6] + 0.03) % (2 * Math.PI)
-        } else {
-          const screenX = window.innerWidth / 2 + (playerthingy.pos[2] - camera.x);
-          const screenY = window.innerHeight / 2 + (playerthingy.pos[3] - camera.y);
-          playerthingy.pos[6] = Math.atan2(mouseY - screenY, mouseX - screenX);
         }
         wasFiring = isFiring
         isFiring = Boolean(autofire || keys.space || keys.click);
@@ -534,8 +530,8 @@ let player = objects.find(o => o.id === playerid);
   }
 objects.forEach(o => {
     if (o.id == playerid) {
-      o.renderX = (typeof o.renderX === 'number') ? o.renderX + (o.pos ? o.pos[4] : 0) + ((o.pos ? o.pos[2] : 0) - o.renderX) * 0.3 : (o.pos ? o.pos[2] : 0);
-      o.renderY = (typeof o.renderY === 'number') ? o.renderY + (o.pos ? o.pos[5] : 0) + ((o.pos ? o.pos[3] : 0) - o.renderY) * 0.3 : (o.pos ? o.pos[3] : 0);
+    o.renderX = (typeof o.renderX === 'number') ? o.renderX + (o.pos[2] - o.renderX) * 0.35 : o.pos[2];
+    o.renderY = (typeof o.renderY === 'number') ? o.renderY + (o.pos[3] - o.renderY) * 0.35 : o.pos[3];
 
       moveX = 0;
       moveY = 0;
