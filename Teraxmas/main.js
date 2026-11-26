@@ -497,8 +497,8 @@ ctx.clearRect(0, 0, canvas.width, canvas.height);
 // Math and Rendering? Me, A Dummy? In Javascript? Robot Time.
 let player = objects.find(o => o.id === playerid);
   if (player) {
-    camera.x += (player.renderX ?? player.pos[2] - camera.x) * 0.1;
-    camera.y += (player.renderY ?? player.pos[3] - camera.y) * 0.1;
+    camera.x += (player.renderX ?? (player.pos[2] - camera.x)) * 0.1;
+    camera.y += (player.renderY ?? (player.pos[3] - camera.y)) * 0.1;
   }
 
   ctx.save();
@@ -529,164 +529,164 @@ let player = objects.find(o => o.id === playerid);
     ctx.stroke();
   }
 objects.forEach(o => {
-    if (o.id == playerid) {
+  // 1. Smoothly interpolate visual position (renderX, renderY) for every object
+  if (Array.isArray(o.pos)) {
     o.renderX = (typeof o.renderX === 'number') ? o.renderX + (o.pos[2] - o.renderX) * 0.35 : o.pos[2];
     o.renderY = (typeof o.renderY === 'number') ? o.renderY + (o.pos[3] - o.renderY) * 0.35 : o.pos[3];
+  }
 
-      moveX = 0;
-      moveY = 0;
-      if (keys["d"]) moveX += 1;
-      if (keys["a"]) moveX -= 1;
-      if (keys["s"]) moveY += 1;
-      if (keys["w"]) moveY -= 1;
-      let length = Math.sqrt(moveX * moveX + moveY * moveY);
-      if (length > 0) {
-        moveX /= length;
-        moveY /= length;
-      }
-      const diameter = (((o.pos ? o.pos[0] : 0) + (o.pos ? o.pos[1] : 0)) / 2) || (o.optional[1] * 2) || 20;
-      const clientSpeed = (baseSpeed * (50 / diameter) * (entity.builds[o.optional?.[3] || 'basic']?.[4] || 1) * (1 + (o.optional?.[4]?.[7] || 0) * 0.07)) / 3;
-      if (o.pos) {
-        o.pos[4] = moveX * clientSpeed;
-        o.pos[5] = moveY * clientSpeed;
-      }
-      playername = o.name;
-      playerxp = o.exp;
+  if (o.id == playerid) {
+    moveX = 0;
+    moveY = 0;
+    if (keys["d"]) moveX += 1;
+    if (keys["a"]) moveX -= 1;
+    if (keys["s"]) moveY += 1;
+    if (keys["w"]) moveY -= 1;
+    let length = Math.sqrt(moveX * moveX + moveY * moveY);
+    if (length > 0) {
+      moveX /= length;
+      moveY /= length;
     }
 
-    if (o.library == "test") {
-      if (o.type == "block") {
-        ctx.fillStyle = o.optional[0];
-        ctx.fillRect(o.pos[2], o.pos[3], o.pos[0], o.pos[1]);
-        ctx.strokeStyle = borderColor(o.optional[0]);
-        ctx.lineWidth = 1;
-        ctx.strokeRect(o.pos[2], o.pos[3], o.pos[0], o.pos[1]);
+    // Keep aim angle updated every frame using smoothed renderX/renderY
+    if (o.pos && !autospin) {
+      const screenX = window.innerWidth / 2 + (o.renderX - camera.x) * camera.zoom;
+      const screenY = window.innerHeight / 2 + (o.renderY - camera.y) * camera.zoom;
+      o.pos[6] = Math.atan2(mouseY - screenY, mouseX - screenX);
+    }
+
+    playername = o.name;
+    playerxp = o.exp;
+  }
+
+  if (o.library == "test") {
+    if (o.type == "block") {
+      ctx.fillStyle = o.optional[0];
+      ctx.fillRect(o.renderX, o.renderY, o.pos[0], o.pos[1]);
+      ctx.strokeStyle = borderColor(o.optional[0]);
+      ctx.lineWidth = 1;
+      ctx.strokeRect(o.renderX, o.renderY, o.pos[0], o.pos[1]);
+    }
+    if (o.type == "circle") {
+      ctx.fillStyle = o.optional[0];
+      ctx.beginPath();
+      ctx.arc(o.renderX, o.renderY, o.optional[1] || ((o.pos[0] / o.pos[1]) * 10), 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.strokeStyle = borderColor(o.optional[0]);
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  } else if (o.library == "player") {
+    const radius = o.optional[1] || ((o.pos[0] / o.pos[1]) * 10) || 10;
+    if (o.type == "tank") {
+      const targetAngle = o.pos[6] || 0;
+      if (o.id === playerid || typeof o.renderAngle !== 'number') {
+        o.renderAngle = targetAngle;
+      } else {
+        let diff = ((targetAngle - o.renderAngle + Math.PI) % (Math.PI * 2)) - Math.PI;
+        if (diff < -Math.PI) diff += Math.PI * 2;
+        o.renderAngle += diff * 0.25;
       }
-      if (o.type == "circle") {
-        ctx.fillStyle = o.optional[0];
+
+      ctx.translate(o.renderX, o.renderY);
+      ctx.rotate(o.renderAngle);
+
+      const turrets = entity.builds[o.optional?.[3] || 'basic']?.[6] || [];
+      ctx.fillStyle = '#999999';
+      ctx.strokeStyle = borderColor('#999999');
+      ctx.lineWidth = 2;
+
+      for (const t of turrets) {
+        const rad = (t[2] * Math.PI) / 180;
+        ctx.rotate(rad);
         ctx.beginPath();
-        ctx.arc(o.pos[2], o.pos[3], o.optional[1] || ((o.pos[0] / o.pos[1]) * 10), 0, 2 * Math.PI);
+        ctx.rect(t[4], t[3] - t[5] / 2, t[6], t[5]);
         ctx.fill();
-        ctx.strokeStyle = borderColor(o.optional[0]);
-        ctx.lineWidth = 1;
         ctx.stroke();
+        ctx.rotate(-rad);
       }
-        } else if (o.library == "player") {
-        const radius = o.optional[1] || ((o.pos[0] / o.pos[1]) * 10) || 10
-        if (o.type == "tank") {
-          const targetAngle = o.pos[6] || 0;
-          if (o.id === playerid || typeof o.renderAngle !== 'number') {
-            o.renderAngle = targetAngle
-          } else {
-            let diff = ((targetAngle - o.renderAngle + Math.PI) % (Math.PI * 2)) - Math.PI;
-            if (diff < -Math.PI) diff += Math.PI * 2;
-            o.renderAngle += diff * 0.25
-          }
-  
-          ctx.translate(o.pos[2], o.pos[3])
-          ctx.rotate(o.renderAngle)
-          const turrets = entity.builds[o.optional?.[3] || 'basic']?.[6] || [];
-          ctx.fillStyle = '#999999';
-          ctx.strokeStyle = borderColor('#999999');
-          ctx.lineWidth = 2;
-  
-          for (const t of turrets) {
-            const rad = (t[2] * Math.PI) / 180;
-            ctx.rotate(rad);
-            ctx.beginPath();
-            ctx.rect(t[4], t[3] - t[5] / 2, t[6], t[5]);
-            ctx.fill();
-            ctx.stroke();
-            ctx.rotate(-rad);
-          }
-          ctx.beginPath()
-          ctx.arc(0, 0, radius, 0, Math.PI * 2)
-          ctx.fillStyle = o.optional?.[0] || '#00b2e1';
-          ctx.fill();
-          ctx.strokeStyle = borderColor(o.optional?.[0] || '#00b2e1');
-          ctx.lineWidth = 1;
-          ctx.stroke();
-  
-          ctx.rotate(-o.renderAngle)
-  
-          if (o.name) {
-            ctx.font = 'bold 6px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 3;
-            ctx.lineJoin = 'round';
-            ctx.strokeText(o.name, 0, -radius - 3);
-  
-            ctx.fillStyle = '#ffffff';
-            ctx.fillText(o.name, 0, -radius - 3);
-          }
-  
-          ctx.translate(-o.pos[2], -o.pos[3]);
-        }
-    } else if (o.library == "wall") {
-      if (o.type == "wall") {
-        if (o.optional[3][2] == 'circle') {
-          ctx.fillStyle = o.optional[0];
-          ctx.beginPath();
-          ctx.arc(o.pos[2], o.pos[3], o.optional[1] || ((o.pos[0] / o.pos[1]) * 10), 0, 2 * Math.PI);
-          ctx.fill();
-          ctx.strokeStyle = borderColor(o.optional[0]);
-          ctx.lineWidth = 4;
-          ctx.stroke();
-        } else {
-          ctx.fillStyle = o.optional[0];
-          ctx.fillRect(o.pos[2], o.pos[3], o.pos[0], o.pos[1]);
-          ctx.strokeStyle = borderColor(o.optional[0]);
-          ctx.lineWidth = 6;
-          ctx.strokeRect(o.pos[2], o.pos[3], o.pos[0], o.pos[1]);
-        }
+
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, 0, Math.PI * 2);
+      ctx.fillStyle = o.optional?.[0] || '#00b2e1';
+      ctx.fill();
+      ctx.strokeStyle = borderColor(o.optional?.[0] || '#00b2e1');
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.rotate(-o.renderAngle);
+
+      if (o.name) {
+        ctx.font = 'bold 6px Arial'
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 3;
+        ctx.lineJoin = 'round';
+        ctx.strokeText(o.name, 0, -radius - 3)
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(o.name, 0, -radius - 3)
       }
-      let multiwall = false
-      let wallsides = 3
-      if (o.type == 'triwall') {multiwall = true; wallsides = 3}
-      if (o.type == 'quadwall') {multiwall = true; wallsides = 4}
-      if (o.type == 'quintwall' || o.type == '5wall') {multiwall = true; wallsides = 5}
-      if (o.type == 'sexwall' || o.type == 'hexwall' || o.type == '6wall') {multiwall = true; wallsides = 6}
-      if (o.type == 'sepwall' || o.type == 'hepwall' || o.type == 'septawall' || o.type == 'heptawall' || o.type == '7wall') {multiwall = true; wallsides = 7}
-      if (o.type == 'octowall' || o.type == 'octawall' || o.type == '8wall') {multiwall = true; wallsides = 8}
-      if (o.type == 'nonawall' || o.type == '9wall') {multiwall = true; wallsides = 9}
-      if (o.type == 'decawall' || o.type == '10wall') {multiwall = true; wallsides = 10}
-      if (o.type == 'hendecawall' || o.type == '11wall') {multiwall = true; wallsides = 11}
-      if (o.type == 'dodecawall' || o.type == '12wall') {multiwall = true; wallsides = 12}
-      if (multiwall) {
-        for (let i = 0; i < wallsides; i++) {
-          const angle = i * (Math.PI * 2) / wallsides;
-          const x = centerX + radius * Math.cos(angle);
-          const y = centerY + radius * Math.sin(angle);
-          if (i === 0) {
-            ctx.moveTo(x, y);
-          } else {
-            ctx.lineTo(x, y);
-          }
-        }
-        ctx.closePath();
-        ctx.fillStyle = o.optional[0];
+
+      ctx.translate(-o.renderX, -o.renderY);
+    }
+  } else if (o.library == "wall") {
+    if (o.type == "wall") {
+      if (o.optional[3][2] == 'circle') {
+        ctx.fillStyle = o.optional[0]
+        ctx.beginPath();
+        ctx.arc(o.renderX, o.renderY, o.optional[1] || ((o.pos[0] / o.pos[1]) * 10), 0, 2 * Math.PI)
         ctx.fill();
-        ctx.strokeStyle = borderColor(o.optional[0]);
+        ctx.strokeStyle = borderColor(o.optional[0])
         ctx.lineWidth = 4;
         ctx.stroke();
-      }
-    } else if(o.library == "bullet") {
-      ctx.fillStyle = o.optional[0];
-        ctx.beginPath();
-        ctx.arc(o.pos[2], o.pos[3], o.optional[1] || ((o.pos[0] / o.pos[1]) * 10), 0, 2 * Math.PI);
-        ctx.fill();
+      } else {
+        ctx.fillStyle = o.optional[0];
+        ctx.fillRect(o.renderX, o.renderY, o.pos[0], o.pos[1]);
         ctx.strokeStyle = borderColor(o.optional[0]);
-        ctx.lineWidth = 1;
-        ctx.stroke();
+        ctx.lineWidth = 6;
+        ctx.strokeRect(o.renderX, o.renderY, o.pos[0], o.pos[1]);
+      }
     }
-  if (o.id === playerid) {
-    o.pos[2] += o.pos[4]
-    o.pos[3] += o.pos[5]
-  } else {
-    o.pos[2] += o.pos[4] / 3
-    o.pos[3] += o.pos[5] / 3
+    let multiwall = false;
+    let wallsides = 3;
+    if (o.type == 'triwall') { multiwall = true; wallsides = 3; }
+    if (o.type == 'quadwall') { multiwall = true; wallsides = 4; }
+    if (o.type == 'quintwall' || o.type == '5wall') { multiwall = true; wallsides = 5; }
+    if (o.type == 'sexwall' || o.type == 'hexwall' || o.type == '6wall') { multiwall = true; wallsides = 6; }
+    if (o.type == 'sepwall' || o.type == 'hepwall' || o.type == 'septawall' || o.type == 'heptawall' || o.type == '7wall') { multiwall = true; wallsides = 7; }
+    if (o.type == 'octowall' || o.type == 'octawall' || o.type == '8wall') { multiwall = true; wallsides = 8; }
+    if (o.type == 'nonawall' || o.type == '9wall') { multiwall = true; wallsides = 9; }
+    if (o.type == 'decawall' || o.type == '10wall') { multiwall = true; wallsides = 10; }
+    if (o.type == 'hendecawall' || o.type == '11wall') { multiwall = true; wallsides = 11; }
+    if (o.type == 'dodecawall' || o.type == '12wall') { multiwall = true; wallsides = 12; }
+    if (multiwall) {
+      for (let i = 0; i < wallsides; i++) {
+        const angle = i * (Math.PI * 2) / wallsides;
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.closePath();
+      ctx.fillStyle = o.optional[0]
+      ctx.fill();
+      ctx.strokeStyle = borderColor(o.optional[0])
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    }
+  } else if (o.library == "bullet") {
+    ctx.fillStyle = o.optional[0]
+    ctx.beginPath();
+    ctx.arc(o.renderX, o.renderY, o.optional[1] || ((o.pos[0] / o.pos[1]) * 10), 0, 2 * Math.PI)
+    ctx.fill();
+    ctx.strokeStyle = borderColor(o.optional[0])
+    ctx.lineWidth = 1;
+    ctx.stroke();
   }
 })
   shapes.forEach((s) => {
