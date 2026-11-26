@@ -139,7 +139,7 @@ function packet(data) {
 
       if (existing) {
                 if (isObjects && sItem.id === playerid) {
-          const localAngle = existing.pos[6];
+          const localAngle = existing.pos ? existing.pos[6] : 0;
           const prevRenderX = existing.renderX ?? sItem.pos[2]
           const prevRenderY = existing.renderY ?? sItem.pos[3]
           Object.assign(existing, sItem)
@@ -502,7 +502,7 @@ let player = objects.find(o => o.id === playerid);
   ctx.save();
   ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
   ctx.scale(camera.zoom, camera.zoom);
-  ctx.translate(-o.renderX, -o.renderY);
+  ctx.translate(-player.renderX, -player.renderY);
   let currentWorld = worldCache[gamemode] ? worldCache[gamemode] : (worlds && worldCache[gamemode] ? worldCache[gamemode] : { width: 1000, height: 1000 });
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, currentWorld.width, currentWorld.height);
