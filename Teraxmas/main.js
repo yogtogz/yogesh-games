@@ -528,8 +528,8 @@ let player = objects.find(o => o.id === playerid);
   }
 objects.forEach(o => {
     if (o.id == playerid) {
-      o.renderX = (typeof o.renderX === 'number') ? o.renderX + (o.pos[2] - o.renderX) * 0.3 : o.pos[2];
-      o.renderY = (typeof o.renderY === 'number') ? o.renderY + (o.pos[3] - o.renderY) * 0.3 : o.pos[3];
+      o.renderX = (typeof o.renderX === 'number') ? o.renderX + ((o.pos ? o.pos[2] : 0) - o.renderX) * 0.3 : (o.pos ? o.pos[2] : 0);
+      o.renderY = (typeof o.renderY === 'number') ? o.renderY + ((o.pos ? o.pos[3] : 0) - o.renderY) * 0.3 : (o.pos ? o.pos[3] : 0)
       moveX = 0;
       moveY = 0;
       if (keys["d"]) moveX += 1;
