@@ -552,7 +552,7 @@ objects.forEach(o => {
     if (o.pos && !autospin) {
       const screenX = window.innerWidth / 2 + (o.renderX - camera.x) * camera.zoom;
       const screenY = window.innerHeight / 2 + (o.renderY - camera.y) * camera.zoom;
-      o.pos[6] = Math.atan2(mouseY - screenY, mouseX - screenX);
+      if (Number.isFinite(Math.atan2(mouseY - screenY, mouseX - screenX))) o.pos[6] = Math.atan2(mouseY - screenY, mouseX - screenX);
     }
 
     playername = o.name;
