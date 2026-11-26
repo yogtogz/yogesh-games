@@ -543,9 +543,10 @@ objects.forEach(o => {
       }
       const diameter = (((o.pos ? o.pos[0] : 0) + (o.pos ? o.pos[1] : 0)) / 2) || (o.optional[1] * 2) || 20;
       const clientSpeed = (baseSpeed * (50 / diameter) * (entity.builds[o.optional?.[3] || 'basic']?.[4] || 1) * (1 + (o.optional?.[4]?.[7] || 0) * 0.07)) / 3;
-      o.pos[4] = moveX * clientSpeed;
-      o.pos[5] = moveY * clientSpeed;
-
+      if (o.pos) {
+        o.pos[4] = moveX * clientSpeed;
+        o.pos[5] = moveY * clientSpeed;
+      }
       playername = o.name;
       playerxp = o.exp;
     }
