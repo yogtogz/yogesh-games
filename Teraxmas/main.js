@@ -502,7 +502,7 @@ let player = objects.find(o => o.id === playerid);
   ctx.save();
   ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
   ctx.scale(camera.zoom, camera.zoom);
-  ctx.translate(Number.isFinite(-player.renderX) ? -player.renderX : 0, Number.isFinite(-player.renderY) ? -player.renderY : 0);
+  ctx.translate(Number.isFinite(-player?.renderX) ? -player.renderX : 0, Number.isFinite(-player?.renderY) ? -player.renderY : 0);
   let currentWorld = worldCache[gamemode] ? worldCache[gamemode] : (worlds && worldCache[gamemode] ? worldCache[gamemode] : { width: 1000, height: 1000 });
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, currentWorld.width, currentWorld.height);
