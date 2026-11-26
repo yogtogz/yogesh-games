@@ -138,29 +138,33 @@ function packet(data) {
       const existing = localMap.get(sItem.id);
 
       if (existing) {
-        if (isObjects && sItem.id === playerid) {
-          existing.pos[0] = sItem.pos[0];
-          existing.pos[1] = sItem.pos[1];
-
-          const dx = sItem.pos[2] - existing.pos[2];
-          const dy = sItem.pos[3] - existing.pos[3];
-          if (Math.hypot(dx, dy) > 30) {
-            existing.pos[2] += (sItem.pos[2] - existing.pos[2]) * 0.35;
-            existing.pos[3] += (sItem.pos[3] - existing.pos[3]) * 0.35;
-          } else if (moveX === 0 && moveY === 0 && dist > 0.5) {
-            existing.pos[2] += dx * 0.25;
-            existing.pos[3] += dy * 0.25;
-          }
-          existing.renderAngle = existing.pos[6] || 0;
-          const { pos, ...serverStats } = sItem;
-          Object.assign(existing, serverStats);
+                if (isObjects && sItem.id === playerid) {
+          const localAngle = existing.pos[6];
+          const prevRenderX = existing.renderX ?? sItem.pos[2]
+          const prevRenderY = existing.renderY ?? sItem.pos[3]
+          Object.assign(existing, sItem)
+          if (typeof localAngle === 'number') existing.pos = localAngle[6];
+          existing.renderX = prevRenderX
+          existing.renderY = prevRenderY;
+          existing.renderAngle = existing.pos[6] || 0
         } else {
-          const prevRenderAngle = existing.renderAngle ?? existing.pos?.[6] ?? 0;
+          const prevRenderX = existing.renderX ?? existing.pos?.[2] ?? sItem.pos[2];
+          const prevRenderY = existing.renderY ?? existing.pos?.[3] ?? sItem.pos[3]
+          const prevRenderAngle = existing.renderAngle ?? existing.pos?.[6] ?? 0
           Object.assign(existing, sItem);
-          if (isObjects) existing.renderAngle = prevRenderAngle;
+          if (isObjects) {
+            existing.renderX = prevRenderX
+            existing.renderY = prevRenderY
+            existing.renderAngle = prevRenderAngle;
+          }
         }
       } else {
-        if (isObjects && Array.isArray(sItem.pos)) sItem.renderAngle = sItem.pos[6] || 0;
+        if (isObjects && Array.isArray(sItem.pos)) {
+          sItem.renderX = sItem.pos[2];
+          sItem.renderY = sItem.pos[3];
+          sItem.renderAngle = sItem.pos[6] || 0;
+        }
+
         localList.push(sItem);
       }
     }
@@ -491,13 +495,14 @@ ctx.clearRect(0, 0, canvas.width, canvas.height);
 // Math and Rendering? Me, A Dummy? In Javascript? Robot Time.
 let player = objects.find(o => o.id === playerid);
   if (player) {
-    camera.x += (player.pos[2] - camera.x) * 0.1;
-    camera.y += (player.pos[3] - camera.y) * 0.1;
+    camera.x += (player.renderX ?? player.pos[2] - camera.x) * 0.1;
+    camera.y += (player.renderY ?? player.pos[3] - camera.y) * 0.1;
   }
+
   ctx.save();
   ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
   ctx.scale(camera.zoom, camera.zoom);
-  ctx.translate(-camera.x, -camera.y);
+  ctx.translate(-o.renderX, -o.renderY);
   let currentWorld = worldCache[gamemode] ? worldCache[gamemode] : (worlds && worldCache[gamemode] ? worldCache[gamemode] : { width: 1000, height: 1000 });
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, currentWorld.width, currentWorld.height);
@@ -523,6 +528,8 @@ let player = objects.find(o => o.id === playerid);
   }
 objects.forEach(o => {
     if (o.id == playerid) {
+      o.renderX = (typeof o.renderX === 'number') ? o.renderX + (o.pos[2] - o.renderX) * 0.3 : o.pos[2];
+      o.renderY = (typeof o.renderY === 'number') ? o.renderY + (o.pos[3] - o.renderY) * 0.3 : o.pos[3];
       moveX = 0;
       moveY = 0;
       if (keys["d"]) moveX += 1;
