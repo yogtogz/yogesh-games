@@ -146,7 +146,7 @@ function packet(data) {
           if (typeof localAngle === 'number') existing.pos = localAngle[6];
           existing.renderX = prevRenderX
           existing.renderY = prevRenderY;
-          existing.renderAngle = existing.pos[6] || 0
+          existing.renderAngle = existing.pos ? existing.pos[6] : 0
         } else {
           const prevRenderX = existing.renderX ?? existing.pos?.[2] ?? sItem.pos[2];
           const prevRenderY = existing.renderY ?? existing.pos?.[3] ?? sItem.pos[3]
