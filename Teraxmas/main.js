@@ -147,7 +147,7 @@ function packet(data) {
           if (Math.hypot(dx, dy) > 30) {
             existing.pos[2] += (sItem.pos[2] - existing.pos[2]) * 0.35;
             existing.pos[3] += (sItem.pos[3] - existing.pos[3]) * 0.35;
-          } else if (moveX === 0 && moveY === 0 && && dist > 0.5) {
+          } else if (moveX === 0 && moveY === 0 && dist > 0.5) {
             existing.pos[2] += dx * 0.25;
             existing.pos[3] += dy * 0.25;
           }
