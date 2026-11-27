@@ -36,7 +36,7 @@ const baseSpeed = 5;
 // HOW TO USE pos
 // id,library,type,[width, height, x, y, vx, vy, angle],xp,damage,optional:opt], tag
 // "id": id, "library": lib, "type": ty, "pos": [w,h,x,y,vx,vy, angle], "exp": xp, "damage": dmg, "hp":[hp, max], "optional": opt, "tag":tag, "name": optional_name
-// opt: [color/hex, radius for circle/tank, collide:[canCollide,BlockOrCircle], tank, [Body Damage 1-9, Max Health 1-9, Bullet Speed 1-9, Bullet Health 1-9, Bullet Penetration 1-9, Bullet Damage 1-9, Reload 1-9, Move Speed 1-9, Shield Regen 1-9, Shield Capacity 1-9]]
+// opt: [color/hex, radius for circle/tank, collide:[canCollide,BlockOrCircle], tank, [Body Damage 1-9, Max Health 1-9, Bullet Speed 1-9, Bullet Health 1-9, Bullet Penetration 1-9, Bullet Damage 1-9, Reload 1-9, Move Speed 1-9, Shield Regen 1-9, Shield Capacity 1-9], [hasTeam, Team]]
 let objects = [
   //{"id":"test_id","library":"test", "type":"block", "pos":[50,50,10,10,0,0,0], "optional":["blue",null,[true,"block"]]}
 ]
@@ -557,20 +557,18 @@ ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.stroke();
   }
 objects.sort((a, b) => 
-  ['bullet', 'player', 'test 2', 'wall'].indexOf(a.library) - 
-  ['bullet', 'player', 'test 2', 'wall'].indexOf(b.library)
+  ['bullet', 'player', 'test 2', 'wall'].Of(a.library) - 
+  ['bullet', 'player', 'test 2', 'wall'].Of(b.library)
 );
 objects.forEach(o => {
   if (Array.isArray(o.pos)) {
-    o.pos[2] += (o.pos[4] || 0) * (dt / 0.05);
-    o.pos[3] += (o.pos[5] || 0) * (dt / 0.05);
-
     if (typeof o.renderX !== 'number') {
-      o.renderX = o.pos[2];
-      o.renderY = o.pos[3];
+      o.renderX = o.pos[ 2];
+      o.renderY = o.pos[ 3];
     } else {
-      o.renderX += (o.pos[2] - o.renderX) * 0.3;
-      o.renderY += (o.pos[3] - o.renderY) * 0.3;
+      const smooth = 1 - Math.pow(0.001, dt);
+      o.renderX += (o.pos[ 2] - o.renderX) * smooth;
+      o.renderY += (o.pos[ 3] - o.renderY) * smooth;
     }
   }
 
@@ -619,7 +617,7 @@ objects.forEach(o => {
   } else if (o.library == "player") {
     const radius = o.optional[1] || ((o.pos[0] / o.pos[1]) * 10) || 10;
     const build = entity.builds[o.optional?.[3] || 'basic'] || [];
-    const bodyType = (o.type && o.type !== 'tank' ? o.type : (build[1] || 'Normal')).toLowerCase();
+    const bodyType = (o.type && o.type !== 'tank' ? o.type : (build[1] || 'normal'))
 
     if (o.type == "tank" || bodyType === 'smasher' || bodyType === 'landmine' || bodyType === 'spike') {
       const targetAngle = o.pos[6] || 0;
@@ -711,7 +709,6 @@ objects.forEach(o => {
         }
       }
 
-      // 2. Normal (non-auto) turrets underneath the body
       ctx.fillStyle = '#999999';
       ctx.strokeStyle = borderColor('#999999');
       ctx.lineWidth = 2;
@@ -727,16 +724,14 @@ objects.forEach(o => {
         ctx.rotate(-rad);
       }
 
-      // 3. Main tank body circle
       ctx.beginPath();
       ctx.arc(0, 0, radius, 0, Math.PI * 2);
-      ctx.fillStyle = o.optional?.[0] || '#00b2e1';
+      ctx.fillStyle = o.optional?.[0] || '#3ca4cb';
       ctx.fill();
-      ctx.strokeStyle = borderColor(o.optional?.[0] || '#00b2e1');
+      ctx.strokeStyle = borderColor(o.optional?.[0] || '#3ca4cb');
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      // 4. Auto turrets + center dome on top of the body
       const autoTurrets = turrets.filter(t => t[0] === 'auto');
       if (autoTurrets.length > 0) {
         ctx.fillStyle = '#999999';
@@ -756,7 +751,6 @@ objects.forEach(o => {
           ctx.rotate(-rad);
         }
 
-        // Center auto-turret dome
         ctx.beginPath();
         ctx.arc(0, 0, radius * 0.55, 0, Math.PI * 2);
         ctx.fillStyle = '#999999';
@@ -766,7 +760,6 @@ objects.forEach(o => {
         ctx.stroke();
       }
 
-      // 5. Undo rotation and draw player name moved closer down to the tank
       ctx.rotate(-o.renderAngle);
 
       if (o.name && drawAlpha > 0.05) {
@@ -950,10 +943,10 @@ objects.forEach(o => {
 
       ctx.beginPath();
       ctx.arc(0, 0, pRad, 0, Math.PI * 2);
-      ctx.fillStyle = player.optional?.[0] || '#00b2e1';
+      ctx.fillStyle = player.optional[5][0] ? player.optional?.[5][1] || player.optional?.[0] : "#f14e54"
       ctx.fill();
       ctx.lineWidth = 2;
-      ctx.strokeStyle = borderColor(player.optional?.[0] || '#00b2e1');
+      ctx.strokeStyle = borderColor(player.optional?.[0] || '#3ca4cb');
       ctx.stroke();
       
       const previewAutos = upTurrets.filter(t => t[0] === 'auto');
