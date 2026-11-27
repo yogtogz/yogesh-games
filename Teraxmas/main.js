@@ -510,10 +510,9 @@ ctx.clearRect(0, 0, canvas.width, canvas.height);
 // Math and Rendering? Me, A Dummy? In Javascript? Robot Time.
   let player = objects.find(o => o.id === playerid);
   if (player) {
-    camera.x = player.renderX ?? player.pos[2];
-    camera.y = player.renderY ?? player.pos[3];
+    camera.x += ((player.renderX ?? player.pos[2]) - camera.x) * 0.25;
+    camera.y += ((player.renderY ?? player.pos[3]) - camera.y) * 0.25;
   }
-
   ctx.save();
   ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
   ctx.scale(camera.zoom, camera.zoom);
@@ -547,16 +546,19 @@ objects.sort((a, b) =>
   ['bullet', 'player', 'test 2', 'wall'].indexOf(b.library)
 );
 objects.forEach(o => {
-  // 1. Smoothly interpolate visual position (renderX, renderY) for every object
   if (Array.isArray(o.pos)) {
+    o.pos[2] += (o.pos[4] || 0) * (dt / 0.05);
+    o.pos[3] += (o.pos[5] || 0) * (dt / 0.05);
+
     if (typeof o.renderX !== 'number') {
       o.renderX = o.pos[2];
       o.renderY = o.pos[3];
     } else {
-      o.renderX += (o.pos[4] || 0) * (dt / 0.05) + (o.pos[2] - o.renderX) * 0.25;
-      o.renderY += (o.pos[5] || 0) * (dt / 0.05) + (o.pos[3] - o.renderY) * 0.25;
+      o.renderX += (o.pos[2] - o.renderX) * 0.3;
+      o.renderY += (o.pos[3] - o.renderY) * 0.3;
     }
   }
+
 
   if (o.id == playerid) {
     moveX = 0;
