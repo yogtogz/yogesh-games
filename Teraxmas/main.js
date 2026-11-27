@@ -473,18 +473,19 @@ function scoreCalc(totalScore) {
   while (score >= requiredForNext) {
     score -= requiredForNext;
     levels++;
-
     if (levels % 9 === 0) {
       step *= 10;
     }
-
     requiredForNext += step;
   }
+
+  const requiredPercent = (score / requiredForNext) * 100;
 
   return {
     lvl: levels,
     score: score,
-    req: requiredForNext
+    req: requiredForNext,
+    reqp: requiredPercent
   };
 }
 function lerpAngle(current, target, t) {
@@ -493,18 +494,17 @@ function lerpAngle(current, target, t) {
   return current + diff * t;
 }
 
-document.getElementById("gamecanvas").addEventListener("click", (e) => {
-  const rect = e.target.getBoundingClientRect();
-  const cx = e.clientX - rect.left;
-  const cy = e.clientY - rect.top;
-
+window.addEventListener("pointerdown", (e) => {
+  if (e.button !== 0 || upgradeBoxes.length === 0) return;
   for (const box of upgradeBoxes) {
-    if (cx >= box.x && cx <= box.x + box.w && cy >= box.y && cy <= box.y + box.h) {
+    if (e.clientX >= box.x && e.clientX <= box.x + box.w && e.clientY >= box.y && e.clientY <= box.y + box.h) {
+      e.stopImmediatePropagation();
+      keys.click = false;
       send('upgrade', { id: playerid, tank: box.tankId });
       break;
     }
   }
-});
+}, true);
 
 let lastTime = 0;
 // W w3schools for the tutorial stuff
@@ -561,15 +561,16 @@ const renderOrder = ['bullet', 'player', 'test 2', 'wall'];
 objects.sort((a, b) => renderOrder.indexOf(a.library) - renderOrder.indexOf(b.library));
 objects.forEach(o => {
   if (Array.isArray(o.pos)) {
-    if (typeof o.renderX !== 'number') {
-      o.renderX = o.pos[ 2];
-      o.renderY = o.pos[ 3];
+    if (o.id === playerid || typeof o.renderX !== 'number') {
+      o.renderX = o.pos[2];
+      o.renderY = o.pos[3];
     } else {
       const smooth = 1 - Math.pow(0.001, dt);
-      o.renderX += (o.pos[ 2] - o.renderX) * smooth;
-      o.renderY += (o.pos[ 3] - o.renderY) * smooth;
+      o.renderX += (o.pos[2] - o.renderX) * smooth;
+      o.renderY += (o.pos[3] - o.renderY) * smooth;
     }
   }
+
 
 
   if (o.id == playerid) {
@@ -664,28 +665,24 @@ objects.forEach(o => {
           ctx.stroke();
           ctx.restore();
         } else {
-          // Landmine second counter-rotating hexagon layer
-          if (bodyType === 'landmine') {
+          if (upType === 'landmine') {
             ctx.save();
-            ctx.rotate(-o.smasherSpin * 1.4);
+            ctx.rotate(-previewSpin * 2.4);
             ctx.beginPath();
-            const outerLandmineR = radius * 1.32;
             for (let i = 0; i < 6; i++) {
               const a = (i * Math.PI) / 3;
-              const sx = Math.cos(a) * outerLandmineR;
-              const sy = Math.sin(a) * outerLandmineR;
-              if (i === 0) ctx.moveTo(sx, sy);
-              else ctx.lineTo(sx, sy);
+              const r = pRad * 1.32;
+              if (i === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+              else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
             }
             ctx.closePath();
             ctx.fillStyle = '#444444';
             ctx.fill();
-            ctx.strokeStyle = '#2b2b2b';
             ctx.lineWidth = 2;
+            ctx.strokeStyle = '#2b2b2b';
             ctx.stroke();
             ctx.restore();
           }
-
           // Smasher & Landmine primary spinning hexagon shell
           ctx.save();
           ctx.rotate(o.smasherSpin);
@@ -736,7 +733,7 @@ objects.forEach(o => {
         ctx.fillStyle = '#999999';
         ctx.strokeStyle = borderColor('#999999');
         ctx.lineWidth = 2;
-
+      
         for (const t of autoTurrets) {
           const baseRad = (t[2] * Math.PI) / 180;
           const rad = (typeof o.autoAngle === 'number')
@@ -749,7 +746,7 @@ objects.forEach(o => {
           ctx.stroke();
           ctx.rotate(-rad);
         }
-
+      
         ctx.beginPath();
         ctx.arc(0, 0, radius * 0.55, 0, Math.PI * 2);
         ctx.fillStyle = '#999999';
@@ -758,7 +755,6 @@ objects.forEach(o => {
         ctx.lineWidth = 1.5;
         ctx.stroke();
       }
-
       ctx.rotate(-o.renderAngle);
 
       if (o.name && drawAlpha > 0.05) {
@@ -913,7 +909,7 @@ objects.forEach(o => {
         ctx.beginPath();
         const pts = upType === 'spike' ? 24 : 6;
         for (let i = 0; i < pts; i++) {
-          const r = upType === 'spike' ? (i % 2 === 0 ? pRad * 1.38 : pRad * 1.05) : pRad * 1.25;
+          const r = upType === 'spike' ? (i % 2 === 0 ? pRad * 1.38 : pRad * 1.05) : pRad * 1.22;
           const a = (i * Math.PI * 2) / pts;
           if (i === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
           else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
@@ -975,7 +971,7 @@ objects.forEach(o => {
 
   ctx.beginPath()
   ctx.fillStyle = 'green'
-  ctx.roundRect(xploc.x, xploc.y, xpsize.x * scoreCalc(playerxp).req, xpsize.y, 20)
+  ctx.roundRect(xploc.x, xploc.y, xpsize.x * scoreCalc(playerxp).reqp, xpsize.y, 20)
   ctx.fill()
   
   const calcName = {"x": window.innerWidth / 2, "y": xploc.y - 16}
