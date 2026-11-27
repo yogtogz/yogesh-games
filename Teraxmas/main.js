@@ -496,8 +496,7 @@ function lerpAngle(current, target, t) {
 
 let lastTime = 0;
 // W w3schools for the tutorial stuff
-function renderCanvas() {
-  
+function renderCanvas(dt = 0.016) {
    const canvas = document.getElementById("gamecanvas");
   const ctx = canvas.getContext("2d");
   canvas.style.width = window.innerWidth + "px";
@@ -547,11 +546,20 @@ ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.lineTo(currentWorld.width, y);
     ctx.stroke();
   }
+objects.sort((a, b) => 
+  ['bullet', 'player', 'test 2', 'wall'].indexOf(a.library) - 
+  ['bullet', 'player', 'test 2', 'wall'].indexOf(b.library)
+);
 objects.forEach(o => {
   // 1. Smoothly interpolate visual position (renderX, renderY) for every object
   if (Array.isArray(o.pos)) {
-    o.renderX = (typeof o.renderX === 'number') ? o.renderX + (o.pos[2] - o.renderX) * 0.35 : o.pos[2];
-    o.renderY = (typeof o.renderY === 'number') ? o.renderY + (o.pos[3] - o.renderY) * 0.35 : o.pos[3];
+    if (typeof o.renderX !== 'number') {
+      o.renderX = o.pos[2];
+      o.renderY = o.pos[3];
+    } else {
+      o.renderX += (o.pos[4] || 0) * (dt / 0.05) + (o.pos[2] - o.renderX) * 0.25;
+      o.renderY += (o.pos[5] || 0) * (dt / 0.05) + (o.pos[3] - o.renderY) * 0.25;
+    }
   }
 
   if (o.id == playerid) {
@@ -763,10 +771,10 @@ objects.forEach(o => {
 function loop(currentTime) {
   requestAnimationFrame(loop);
 
+  const dt = lastTime ? Math.min(0.1, (currentTime - lastTime) / 1000) : 0.016;
   lastTime = currentTime;
-  const dt = (currentTime - lastTime) / 1000;
 
-  renderCanvas();
+  renderCanvas(dt);
 }
 
 window.onwheel = function(event) {
