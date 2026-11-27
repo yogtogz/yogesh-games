@@ -556,10 +556,8 @@ ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.lineTo(currentWorld.width, y);
     ctx.stroke();
   }
-objects.sort((a, b) => 
-  ['bullet', 'player', 'test 2', 'wall'].Of(a.library) - 
-  ['bullet', 'player', 'test 2', 'wall'].Of(b.library)
-);
+const renderOrder = ['bullet', 'player', 'test 2', 'wall'];
+objects.sort((a, b) => renderOrder.indexOf(a.library) - renderOrder.indexOf(b.library));
 objects.forEach(o => {
   if (Array.isArray(o.pos)) {
     if (typeof o.renderX !== 'number') {
