@@ -941,7 +941,7 @@ objects.forEach(o => {
 
       ctx.beginPath();
       ctx.arc(0, 0, pRad, 0, Math.PI * 2);
-      ctx.fillStyle = player.optional[5][0] ? player.optional?.[5][1] || player.optional?.[0] : "#f14e54"
+      ctx.fillStyle = player.optional?.[5][0] ? player.optional?.[5][1] || player.optional?.[0] : "#f14e54"
       ctx.fill();
       ctx.lineWidth = 2;
       ctx.strokeStyle = borderColor(player.optional?.[0] || '#3ca4cb');
