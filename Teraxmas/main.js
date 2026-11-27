@@ -264,7 +264,9 @@ window.addEventListener("mousemove", (e) => {
   if (me?.pos && !autospin) {
     const screenX = window.innerWidth / 2 + ((me.renderX ?? me.pos[2]) - camera.x) * camera.zoom;
     const screenY = window.innerHeight / 2 + ((me.renderY ?? me.pos[3]) - camera.y) * camera.zoom;
-    me.pos[6] = Math.atan2(mouseY - screenY, mouseX - screenX);
+    if (o.pos && !autospin) {
+      o.pos[6] = Math.atan2(mouseY - window.innerHeight / 2, mouseX - window.innerWidth / 2);
+    }
   }
 });
 // Functions
@@ -495,16 +497,17 @@ ctx.setTransform(1, 0, 0, 1, 0, 0);
 ctx.clearRect(0, 0, canvas.width, canvas.height);
  ctx.scale(dpr,dpr);
 // Math and Rendering? Me, A Dummy? In Javascript? Robot Time.
-let player = objects.find(o => o.id === playerid);
+  let player = objects.find(o => o.id === playerid);
   if (player) {
-    camera.x += (player.renderX ?? (player.pos[2] - camera.x)) * 0.1;
-    camera.y += (player.renderY ?? (player.pos[3] - camera.y)) * 0.1;
+    camera.x = player.renderX ?? player.pos[2];
+    camera.y = player.renderY ?? player.pos[3];
   }
 
   ctx.save();
   ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
   ctx.scale(camera.zoom, camera.zoom);
-  ctx.translate(Number.isFinite(-player?.renderX) ? -player.renderX : 0, Number.isFinite(-player?.renderY) ? -player.renderY : 0);
+  ctx.translate(-camera.x, -camera.y);
+  
   let currentWorld = worldCache[gamemode] ? worldCache[gamemode] : (worlds && worldCache[gamemode] ? worldCache[gamemode] : { width: 1000, height: 1000 });
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, currentWorld.width, currentWorld.height);
