@@ -23,6 +23,29 @@
     "strange":{"color":"#3A2BEA","type":"weird"}
   },
   "builds": {
-    "basic": ["Basic", "normal", false, [false, 0], 1, 1, [["normal", 1.2, 0, 0, 0, 8, 15, 0.9, 0.95, 8, false, 0]], ["twin"]]
+    "basic": ["Basic", "normal", false, [false, 0], 1, 1, [["normal", 1.2, 0, 0, 0, 8, 15, 0.9, 0.95, 8, false, 0]], ["auto", "smasher"]],
+    "auto": [
+      "Auto 1",
+      "Normal",
+      true,
+      [false, 0],
+      1.0,
+      1.0,
+      [
+        ["auto", 1.5, 0, 0, 0, 7, 14, 0.9, 1.0, 6.5, false, 0, 0.45, 0]
+      ],
+      []
+    ],
+    "smasher": [
+      "Smasher",
+      "Smasher",
+      false,
+      [false, 0],
+      1.15,
+      1.0,
+      [],
+      []
+    ]
+
   }
 }
