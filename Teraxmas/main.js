@@ -414,7 +414,7 @@ function idGen() {
     }
     return result;
 }
-function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, xp=0, dmg=0, hp=[300,300], opt=["default", null,[false,"block"], null, null, [false, "blue"]], tag=null,id=idGen(), name = "") {
+function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, xp=0, dmg=0, hp=[100,100], opt=["default", null,[false,"block"], null, null, [false, "blue"]], tag=null,id=idGen(), name = "") {
   if (lib == "player") send('player_new', [lib, ty, w, h, x, y, vx, vy, xp, dmg, hp, opt, tag, id, name])
 }
 async function renderGame(what) {
