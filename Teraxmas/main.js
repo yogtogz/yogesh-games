@@ -414,7 +414,7 @@ function idGen() {
     }
     return result;
 }
-function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, xp=0, dmg=0, hp=[100,100], opt=["default", null,[false,"block"], null, null], tag=null,id=idGen(), name = "") {
+function summonObject(lib="test", ty="block", w=50, h=50, x=0, y=0, vx=0, vy=0, xp=0, dmg=0, hp=[100,100], opt=["default", null,[false,"block"], null, null, [false, "blue"]], tag=null,id=idGen(), name = "") {
   if (lib == "player") send('player_new', [lib, ty, w, h, x, y, vx, vy, xp, dmg, hp, opt, tag, id, name])
 }
 async function renderGame(what) {
@@ -424,7 +424,7 @@ async function renderGame(what) {
     ? window.entity.player.tank.color 
     : "#3ca4cb";
     playerid = idGen()
-    summonObject("player","tank", 0, 0, Math.random() * worldCache[gamemode].width, Math.random() * worldCache[gamemode].height, 0, 0, 100, 100, [100, 100], [tankColor, 10, [true, "block"], "basic", [0,0,0,0,0,0,0,0,0,0]], "player", playerid, (document.getElementById('name').value.trim() !== "" ?  document.getElementById('name').value : "Nameless Tank"))
+    summonObject("player","tank", 0, 0, Math.random() * worldCache[gamemode].width, Math.random() * worldCache[gamemode].height, 0, 0, 100, 100, [100, 100], [tankColor, 10, [true, "block"], "basic", [0,0,0,0,0,0,0,0,0,0], [false, "blue"]], "player", playerid, (document.getElementById('name').value.trim() !== "" ?  document.getElementById('name').value : "Nameless Tank"))
     requestAnimationFrame(loop);
     handleKeys(); // Handle key presses
     ui.style.display = "block";
