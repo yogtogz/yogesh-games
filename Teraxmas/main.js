@@ -483,7 +483,8 @@ function scoreCalc(totalScore) {
 
   return {
     lvl: levels,
-    score: score
+    score: score,
+    req: requiredForNext
   };
 }
 function lerpAngle(current, target, t) {
@@ -879,9 +880,9 @@ objects.forEach(o => {
     ctx.textBaseline = 'middle';
     ctx.fillText('Upgrades', startX + 10, startY + 12);
 
-    availableUpgrades.forEach(([upId, reqLvl], idx) => {
+        availableUpgrades.forEach(([upId, reqLvl], idx) => {
       const upBuild = entity?.builds?.[upId];
-      if (!upBuild) return;
+      if (!Array.isArray(upBuild)) return;
 
       const bx = startX + idx * (cardSize + gap);
       const by = startY + 32;
@@ -901,8 +902,8 @@ objects.forEach(o => {
       const cx = bx + cardSize / 2;
       const cy = by + cardSize / 2 - 6;
       const previewSpin = (performance.now() / 900) % (Math.PI * 2);
-      const upType = (upBuild[1] || 'Normal').toLowerCase();
-      const upTurrets = upBuild[6] || [];
+      const upType = String(upBuild[1] || 'Normal').toLowerCase(); // 1 = TankType
+      const upTurrets = Array.isArray(upBuild[6]) ? upBuild[6] : []; // 6 = Turrets
       const pRad = 13;
 
       ctx.translate(cx, cy);
@@ -941,31 +942,11 @@ objects.forEach(o => {
 
       ctx.beginPath();
       ctx.arc(0, 0, pRad, 0, Math.PI * 2);
-      ctx.fillStyle = player.optional?.[5][0] ? player.optional?.[5][1] || player.optional?.[0] : "#f14e54"
+      ctx.fillStyle = player.optional?.[0] || '#00b2e1';
       ctx.fill();
       ctx.lineWidth = 2;
-      ctx.strokeStyle = borderColor(player.optional?.[0] || '#3ca4cb');
+      ctx.strokeStyle = borderColor(player.optional?.[0] || '#00b2e1');
       ctx.stroke();
-      
-      const previewAutos = upTurrets.filter(t => t[0] === 'auto');
-      if (previewAutos.length > 0) {
-        ctx.fillStyle = '#999999';
-        ctx.strokeStyle = '#555555';
-        for (const t of previewAutos) {
-          const rad = (t[2] * Math.PI) / 180;
-          ctx.rotate(rad);
-          ctx.beginPath();
-          ctx.rect(t[4] * 1.2, (t[3] - t[5] / 2) * 1.2, t[6] * 1.2, t[5] * 1.2);
-          ctx.fill();
-          ctx.stroke();
-          ctx.rotate(-rad);
-        }
-        ctx.beginPath();
-        ctx.arc(0, 0, pRad * 0.55, 0, Math.PI * 2);
-        ctx.fillStyle = '#999999';
-        ctx.fill();
-        ctx.stroke();
-      }
 
       ctx.rotate(-previewSpin);
       ctx.translate(-cx, -cy);
@@ -975,9 +956,9 @@ objects.forEach(o => {
       ctx.textBaseline = 'bottom';
       ctx.lineWidth = 3;
       ctx.strokeStyle = '#000000';
-      ctx.strokeText(upBuild[0], cx, by + cardSize - 5);
+      ctx.strokeText(String(upBuild[0] || upId), cx, by + cardSize - 5); // 0 = TankName
       ctx.fillStyle = '#ffffff';
-      ctx.fillText(upBuild[0], cx, by + cardSize - 5);
+      ctx.fillText(String(upBuild[0] || upId), cx, by + cardSize - 5);
       ctx.restore();
     });
   }
@@ -991,6 +972,11 @@ objects.forEach(o => {
   ctx.roundRect(xploc.x, xploc.y, xpsize.x, xpsize.y, 20);
   ctx.fill();
   ctx.stroke();
+
+  ctx.beginPath()
+  ctx.fillStyle = 'green'
+  ctx.roundRect(xploc.x, xploc.y, xpsize.x * scoreCalc(playerxp).req, xpsize.y, 20)
+  ctx.fill()
   
   const calcName = {"x": window.innerWidth / 2, "y": xploc.y - 16}
   const calcScore = {"x": window.innerWidth / 2, "y": xploc.y + (xpsize.y / 2)}
