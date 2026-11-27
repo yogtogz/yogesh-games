@@ -485,7 +485,7 @@ function scoreCalc(totalScore) {
     lvl: levels,
     score: score,
     req: requiredForNext,
-    reqp: requiredPercent
+    reqp: requiredPercent / 100
   };
 }
 function lerpAngle(current, target, t) {
@@ -561,7 +561,7 @@ const renderOrder = ['bullet', 'player', 'test 2', 'wall'];
 objects.sort((a, b) => renderOrder.indexOf(a.library) - renderOrder.indexOf(b.library));
 objects.forEach(o => {
   if (Array.isArray(o.pos)) {
-    if (o.id === playerid || typeof o.renderX !== 'number') {
+    if (typeof o.renderX !== 'number') {
       o.renderX = o.pos[2];
       o.renderY = o.pos[3];
     } else {
@@ -769,6 +769,23 @@ objects.forEach(o => {
         ctx.fillStyle = '#ffffff';
         ctx.fillText(o.name, 0, -radius - 1);
       }
+      if (!Array.isArray(o.hp)) o.hp = [o.hp, 100]
+      if (o.hp[0] < o.hp[1] && drawAlpha > 0.05) {
+        const barW = radius * 2.4;
+        const barH = 3.5;
+        const pct = Math.max(0, Math.min(1, o.hp[0] / o.hp[1]));
+
+        ctx.fillStyle = '#555555';
+        ctx.fillRect(-barW / 2, radius + 4, barW, barH);
+
+        ctx.fillStyle = '#85e37d';
+        ctx.fillRect(-barW / 2, radius + 4, barW * pct, barH);
+
+        ctx.strokeStyle = '#333333';
+        ctx.lineWidth = 0.8;
+        ctx.strokeRect(-barW / 2, radius + 4, barW, barH);
+      }
+
 
       ctx.restore();
     }
