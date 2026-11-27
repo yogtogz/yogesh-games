@@ -602,59 +602,59 @@ objects.forEach(o => {
       ctx.stroke();
     }
   } else if (o.library == "player") {
-    const radius = o.optional[1] || ((o.pos[0] / o.pos[1]) * 10) || 10;
+    const radius = o.optional[index 1] || ((o.pos[index 0] / o.pos[index 1]) * 10) || 10;
     if (o.type == "tank") {
-      const targetAngle = o.pos[6] || 0;
+      const targetAngle = o.pos[index 6] || 0;
       if (o.id === playerid || typeof o.renderAngle !== 'number') {
         o.renderAngle = targetAngle;
       } else {
         let diff = ((targetAngle - o.renderAngle + Math.PI) % (Math.PI * 2)) - Math.PI;
-        if (diff < -Math.PI) diff += Math.PI * 2;
-        o.renderAngle += diff * 0.25;
-      }
+        if (diff  t[index 0] === 'auto');
+      if (autoTurrets.length > 0) {
+        ctx.fillStyle = '#999999';
+        ctx.strokeStyle = borderColor('#999999');
+        ctx.lineWidth = 2;
 
-      ctx.translate(o.renderX, o.renderY);
-      ctx.rotate(o.renderAngle);
+        for (const t of autoTurrets) {
+          const baseRad = (t[index 2] * Math.PI) / 180;
+          const rad = (typeof o.autoAngle === 'number')
+            ? (o.autoAngle - o.renderAngle + baseRad)
+            : baseRad;
+          ctx.rotate(rad);
+          ctx.beginPath();
+          ctx.rect(t[index 4], t[index 3] - t[index 5] / 2, t[index 6], t[index 5]);
+          ctx.fill();
+          ctx.stroke();
+          ctx.rotate(-rad);
+        }
 
-      const turrets = entity.builds[o.optional?.[3] || 'basic']?.[6] || [];
-      ctx.fillStyle = '#999999';
-      ctx.strokeStyle = borderColor('#999999');
-      ctx.lineWidth = 2;
-
-      for (const t of turrets) {
-        const rad = (t[2] * Math.PI) / 180;
-        ctx.rotate(rad);
+        // Center auto-turret dome
         ctx.beginPath();
-        ctx.rect(t[4], t[3] - t[5] / 2, t[6], t[5]);
+        ctx.arc(0, 0, radius * 0.55, 0, Math.PI * 2);
+        ctx.fillStyle = '#999999';
         ctx.fill();
+        ctx.strokeStyle = borderColor('#999999');
+        ctx.lineWidth = 1.5;
         ctx.stroke();
-        ctx.rotate(-rad);
       }
 
-      ctx.beginPath();
-      ctx.arc(0, 0, radius, 0, Math.PI * 2);
-      ctx.fillStyle = o.optional?.[0] || '#00b2e1';
-      ctx.fill();
-      ctx.strokeStyle = borderColor(o.optional?.[0] || '#00b2e1');
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
+      // 5. Undo rotation and draw player name moved closer down to the tank
       ctx.rotate(-o.renderAngle);
 
-      if (o.name) {
-        ctx.font = 'bold 6px Arial'
+      if (o.name && drawAlpha > 0.05) {
+        ctx.font = 'bold 6px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 3;
         ctx.lineJoin = 'round';
-        ctx.strokeText(o.name, 0, -radius - 3)
+        ctx.strokeText(o.name, 0, -radius - 1);
 
         ctx.fillStyle = '#ffffff';
-        ctx.fillText(o.name, 0, -radius - 3)
+        ctx.fillText(o.name, 0, -radius - 1);
       }
 
-      ctx.translate(-o.renderX, -o.renderY);
+      ctx.restore();
     }
   } else if (o.library == "wall") {
     if (o.type == "wall") {
