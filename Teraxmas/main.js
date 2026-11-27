@@ -69,6 +69,21 @@ async function registerJsonVariables() {
   window.worlds = await definitionJsonLoader("worlds");
   return true;
 }
+
+window.addEventListener("blur", () => {
+  for (const key in keys) {
+    keys[key] = false;
+  }
+})
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    for (const key in keys) {
+      keys[key] = false;
+    }
+  }
+})
+
 async function loadServers() {
   await registerJsonVariables();
   const once = (target, event) => new Promise((resolve) => {
@@ -205,11 +220,12 @@ function connect() {
       window.socket.send(JSON.stringify({ type: 'greeting', data: { connected: true } }))
 
       window.stateInterval = setInterval(() => {
-        if (moveX !== 0 || moveY !== 0 || lastMoveX !== 0 || lastMoveY !== 0) {
+        if (moveX !== lastMoveX || moveY !== lastMoveY) {
           send('move', { id: playerid, x: moveX, y: moveY, collide: true });
           lastMoveX = moveX;
           lastMoveY = moveY;
         }
+
         let playerthingy = objects.find(child => child.id === playerid)
         if (playerthingy?.pos) {
         if (autospin) {
