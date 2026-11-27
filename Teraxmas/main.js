@@ -12,6 +12,7 @@ let autospin = false;
 let autofire = false;
 let isFiring = false;
 let wasFiring = false;
+let upgradeBoxes = [];
 const keys = {"a":false,"b":false,"c":false,"d":false,"e":false,"f":false,"g":false,"h":false,"i":false,"j":false,"k":false,"l":false,"m":false,"n":false,"o":false,"p":false,"q":false,"r":false,"s":false,"t":false,"u":false,"v":false,"w":false,"x":false,"y":false,"z":false,"0":false,"1":false,"2":false,"3":false,"4":false,"5":false,"6":false,"7":false,"8":false,"9":false,"enter":false,"escape":false,"space":false,"backspace":false,"shift":false,"control":false,"alt":false,"arrowup":false,"arrowdown":false,"arrowleft":false,"arrowright":false,"minus":false,"equal":false,"bracketleft":false,"bracketright":false,"backslash":false,"semicolon":false,"quote":false,"comma":false,"period":false,"slash":false,"backquote":false};
 const camera = {
   x: 0,
@@ -132,13 +133,14 @@ function borderColor(fillHex, borderBlendHex = "#484848", blendRatio = 0.5) {
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 // CONNECTION FUNCTION
-// I was miraculously able to do a good portion of this myself, wow! (backend, i was able to do half)
 // data: {type, data}
 // state_variable: {type: 'state_variable', data:{'The Entire state variable': 'is here'}
+// state: {player: number, objects: {}, shapes: {}}
 
 // robot. I hate using robot bro I keep getting errors from it I would have probably done better myself
 // take this as a lesson, devtool lurkers.
 function packet(data) {
+  if (data?.type == "upgraded") objects.every(item => item.id === playerid).optional[3] = data.data
   if (data?.type !== 'state_variable') return;
 
   for (const [localList, serverList, isObjects] of [
@@ -490,6 +492,19 @@ function lerpAngle(current, target, t) {
   return current + diff * t;
 }
 
+document.getElementById("gamecanvas").addEventListener("click", (e) => {
+  const rect = e.target.getBoundingClientRect();
+  const cx = e.clientX - rect.left;
+  const cy = e.clientY - rect.top;
+
+  for (const box of upgradeBoxes) {
+    if (cx >= box.x && cx <= box.x + box.w && cy >= box.y && cy <= box.y + box.h) {
+      send('upgrade', { id: playerid, tank: box.tankId });
+      break;
+    }
+  }
+});
+
 let lastTime = 0;
 // W w3schools for the tutorial stuff
 function renderCanvas(dt = 0.016) {
@@ -602,27 +617,140 @@ objects.forEach(o => {
       ctx.stroke();
     }
   } else if (o.library == "player") {
-    const radius = o.optional[index 1] || ((o.pos[index 0] / o.pos[index 1]) * 10) || 10;
-    if (o.type == "tank") {
-      const targetAngle = o.pos[index 6] || 0;
+    const radius = o.optional[1] || ((o.pos[0] / o.pos[1]) * 10) || 10;
+    const build = entity.builds[o.optional?.[3] || 'basic'] || [];
+    const bodyType = (o.type && o.type !== 'tank' ? o.type : (build[1] || 'Normal')).toLowerCase();
+
+    if (o.type == "tank" || bodyType === 'smasher' || bodyType === 'landmine' || bodyType === 'spike') {
+      const targetAngle = o.pos[6] || 0;
       if (o.id === playerid || typeof o.renderAngle !== 'number') {
         o.renderAngle = targetAngle;
       } else {
         let diff = ((targetAngle - o.renderAngle + Math.PI) % (Math.PI * 2)) - Math.PI;
-        if (diff  t[index 0] === 'auto');
+        if (diff < -Math.PI) diff += Math.PI * 2;
+        o.renderAngle += diff * 0.25;
+      }
+
+      const turrets = build[6] || [];
+
+      const serverAlpha = typeof o.alpha === 'number' ? o.alpha : 1;
+      const drawAlpha = (o.id === playerid) ? Math.max(0.25, serverAlpha) : serverAlpha;
+
+      ctx.save();
+      ctx.globalAlpha = drawAlpha;
+      ctx.translate(o.renderX, o.renderY);
+      ctx.rotate(o.renderAngle);
+
+      if (bodyType === 'smasher' || bodyType === 'landmine' || bodyType === 'spike') {
+        o.smasherSpin = ((o.smasherSpin || 0) + (bodyType === 'spike' ? 0.06 : 0.04)) % (Math.PI * 2);
+
+        if (bodyType === 'spike') {
+          ctx.save();
+          ctx.rotate(o.smasherSpin);
+          ctx.beginPath();
+          const spikes = 12;
+          const outerR = radius * 1.38;
+          const innerR = radius * 1.05;
+          for (let i = 0; i < spikes * 2; i++) {
+            const r = (i % 2 === 0) ? outerR : innerR;
+            const a = (i * Math.PI) / spikes;
+            const sx = Math.cos(a) * r;
+            const sy = Math.sin(a) * r;
+            if (i === 0) ctx.moveTo(sx, sy);
+            else ctx.lineTo(sx, sy);
+          }
+          ctx.closePath();
+          ctx.fillStyle = '#555555';
+          ctx.fill();
+          ctx.strokeStyle = '#333333';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.restore();
+        } else {
+          // Landmine second counter-rotating hexagon layer
+          if (bodyType === 'landmine') {
+            ctx.save();
+            ctx.rotate(-o.smasherSpin * 1.4);
+            ctx.beginPath();
+            const outerLandmineR = radius * 1.32;
+            for (let i = 0; i < 6; i++) {
+              const a = (i * Math.PI) / 3;
+              const sx = Math.cos(a) * outerLandmineR;
+              const sy = Math.sin(a) * outerLandmineR;
+              if (i === 0) ctx.moveTo(sx, sy);
+              else ctx.lineTo(sx, sy);
+            }
+            ctx.closePath();
+            ctx.fillStyle = '#444444';
+            ctx.fill();
+            ctx.strokeStyle = '#2b2b2b';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          // Smasher & Landmine primary spinning hexagon shell
+          ctx.save();
+          ctx.rotate(o.smasherSpin);
+          ctx.beginPath();
+          const shellRadius = radius * 1.22;
+          for (let i = 0; i < 6; i++) {
+            const a = (i * Math.PI) / 3;
+            const sx = Math.cos(a) * shellRadius;
+            const sy = Math.sin(a) * shellRadius;
+            if (i === 0) ctx.moveTo(sx, sy);
+            else ctx.lineTo(sx, sy);
+          }
+          ctx.closePath();
+          ctx.fillStyle = '#555555';
+          ctx.fill();
+          ctx.strokeStyle = '#333333';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      // 2. Normal (non-auto) turrets underneath the body
+      ctx.fillStyle = '#999999';
+      ctx.strokeStyle = borderColor('#999999');
+      ctx.lineWidth = 2;
+
+      for (const t of turrets) {
+        if (t[0] === 'auto') continue;
+        const rad = (t[2] * Math.PI) / 180;
+        ctx.rotate(rad);
+        ctx.beginPath();
+        ctx.rect(t[4], t[3] - t[5] / 2, t[6], t[5]);
+        ctx.fill();
+        ctx.stroke();
+        ctx.rotate(-rad);
+      }
+
+      // 3. Main tank body circle
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, 0, Math.PI * 2);
+      ctx.fillStyle = o.optional?.[0] || '#00b2e1';
+      ctx.fill();
+      ctx.strokeStyle = borderColor(o.optional?.[0] || '#00b2e1');
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // 4. Auto turrets + center dome on top of the body
+      const autoTurrets = turrets.filter(t => t[0] === 'auto');
       if (autoTurrets.length > 0) {
         ctx.fillStyle = '#999999';
         ctx.strokeStyle = borderColor('#999999');
         ctx.lineWidth = 2;
 
         for (const t of autoTurrets) {
-          const baseRad = (t[index 2] * Math.PI) / 180;
+          const baseRad = (t[2] * Math.PI) / 180;
           const rad = (typeof o.autoAngle === 'number')
             ? (o.autoAngle - o.renderAngle + baseRad)
             : baseRad;
           ctx.rotate(rad);
           ctx.beginPath();
-          ctx.rect(t[index 4], t[index 3] - t[index 5] / 2, t[index 6], t[index 5]);
+          ctx.rect(t[4], t[3] - t[5] / 2, t[6], t[5]);
           ctx.fill();
           ctx.stroke();
           ctx.rotate(-rad);
@@ -734,6 +862,134 @@ objects.forEach(o => {
     ctx.stroke();
   });
   ctx.restore();
+  const currentTankId = player?.optional?.[3] || 'basic';
+  const currentBuild = entity?.builds?.[currentTankId];
+  const upgradesMap = (currentBuild?.[7] && typeof currentBuild[7] === 'object' && !Array.isArray(currentBuild[7]))
+    ? currentBuild[7]
+    : {};
+  const currentLvl = player ? scoreCalc(player.exp || 0).lvl : 0;
+  const availableUpgrades = Object.entries(upgradesMap).filter(([_, reqLvl]) => currentLvl >= reqLvl);
+
+  if (player && availableUpgrades.length > 0) {
+    const cardColors = ['#6cf0f0', '#87f06c', '#f06c6c', '#f0d96c', '#b66cf0', '#f09c6c'];
+    const cardSize = 78;
+    const gap = 10;
+    const startX = 16;
+    const startY = 16;
+
+    // Diep-style header pill
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+    ctx.beginPath();
+    ctx.roundRect(startX, startY, Math.max(130, availableUpgrades.length * (cardSize + gap) - gap), 24, 6);
+    ctx.fill();
+    ctx.font = 'bold 13px Arial';
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Upgrades', startX + 10, startY + 12);
+
+    availableUpgrades.forEach(([upId, reqLvl], idx) => {
+      const upBuild = entity?.builds?.[upId];
+      if (!upBuild) return;
+
+      const bx = startX + idx * (cardSize + gap);
+      const by = startY + 32;
+      const bg = cardColors[idx % cardColors.length];
+
+      upgradeBoxes.push({ x: bx, y: by, w: cardSize, h: cardSize, tankId: upId });
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(bx, by, cardSize, cardSize, 8);
+      ctx.fillStyle = bg;
+      ctx.fill();
+      ctx.lineWidth = 3.5;
+      ctx.strokeStyle = borderColor(bg);
+      ctx.stroke();
+
+      const cx = bx + cardSize / 2;
+      const cy = by + cardSize / 2 - 6;
+      const previewSpin = (performance.now() / 900) % (Math.PI * 2);
+      const upType = (upBuild[1] || 'Normal').toLowerCase();
+      const upTurrets = upBuild[6] || [];
+      const pRad = 13;
+
+      ctx.translate(cx, cy);
+      ctx.rotate(previewSpin);
+
+      if (upType === 'smasher' || upType === 'landmine' || upType === 'spike') {
+        ctx.beginPath();
+        const pts = upType === 'spike' ? 24 : 6;
+        for (let i = 0; i < pts; i++) {
+          const r = upType === 'spike' ? (i % 2 === 0 ? pRad * 1.38 : pRad * 1.05) : pRad * 1.25;
+          const a = (i * Math.PI * 2) / pts;
+          if (i === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+          else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+        }
+        ctx.closePath();
+        ctx.fillStyle = '#555555';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#333333';
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#999999';
+      ctx.strokeStyle = '#555555';
+      ctx.lineWidth = 2;
+      for (const t of upTurrets) {
+        if (t[0] === 'auto') continue;
+        const rad = (t[2] * Math.PI) / 180;
+        ctx.rotate(rad);
+        ctx.beginPath();
+        ctx.rect(t[4] * 1.2, (t[3] - t[5] / 2) * 1.2, t[6] * 1.2, t[5] * 1.2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.rotate(-rad);
+      }
+
+      ctx.beginPath();
+      ctx.arc(0, 0, pRad, 0, Math.PI * 2);
+      ctx.fillStyle = player.optional?.[0] || '#00b2e1';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = borderColor(player.optional?.[0] || '#00b2e1');
+      ctx.stroke();
+      
+      const previewAutos = upTurrets.filter(t => t[0] === 'auto');
+      if (previewAutos.length > 0) {
+        ctx.fillStyle = '#999999';
+        ctx.strokeStyle = '#555555';
+        for (const t of previewAutos) {
+          const rad = (t[2] * Math.PI) / 180;
+          ctx.rotate(rad);
+          ctx.beginPath();
+          ctx.rect(t[4] * 1.2, (t[3] - t[5] / 2) * 1.2, t[6] * 1.2, t[5] * 1.2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.rotate(-rad);
+        }
+        ctx.beginPath();
+        ctx.arc(0, 0, pRad * 0.55, 0, Math.PI * 2);
+        ctx.fillStyle = '#999999';
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      ctx.rotate(-previewSpin);
+      ctx.translate(-cx, -cy);
+
+      ctx.font = 'bold 11px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#000000';
+      ctx.strokeText(upBuild[0], cx, by + cardSize - 5);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(upBuild[0], cx, by + cardSize - 5);
+      ctx.restore();
+    });
+  }
     // time to make myself an xp bar (robotless, but tutorialful)
   const xpsize = { "x": window.innerWidth / 3, "y": window.innerHeight / 20 }
   const xploc = { "x": (window.innerWidth / 2) - (xpsize.x / 2), "y": window.innerHeight - xpsize.y - 10 };
