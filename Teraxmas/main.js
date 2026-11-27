@@ -278,11 +278,7 @@ window.addEventListener("mousemove", (e) => {
   mouseY = e.clientY;
   const me = objects.find(o => o.id === playerid);
   if (me?.pos && !autospin) {
-    const screenX = window.innerWidth / 2 + ((me.renderX ?? me.pos[2]) - camera.x) * camera.zoom;
-    const screenY = window.innerHeight / 2 + ((me.renderY ?? me.pos[3]) - camera.y) * camera.zoom;
-    if (me.pos && !autospin) {
-      me.pos[6] = Math.atan2(mouseY - window.innerHeight / 2, mouseX - window.innerWidth / 2);
-    }
+    me.pos[6] = Math.atan2(mouseY - window.innerHeight / 2, mouseX - window.innerWidth / 2);
   }
 });
 // Functions
