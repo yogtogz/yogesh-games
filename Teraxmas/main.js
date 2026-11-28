@@ -561,17 +561,23 @@ const renderOrder = ['bullet', 'player', 'test 2', 'wall'];
 objects.sort((a, b) => renderOrder.indexOf(a.library) - renderOrder.indexOf(b.library));
 objects.forEach(o => {
   if (Array.isArray(o.pos)) {
-    if (typeof o.renderX !== 'number') {
-      o.renderX = o.pos[2];
-      o.renderY = o.pos[3];
+    if (o.library === 'bullet' || typeof o.renderX !== 'number') {
+      // Bullets move linearly with zero exponential lag so they never curve!
+      if (o.library === 'bullet' && typeof o.renderX === 'number') {
+        o.renderX += (o.pos[index 4] || 0) * (dt / 0.05);
+        o.renderY += (o.pos[index 5] || 0) * (dt / 0.05);
+        o.renderX += (o.pos[index 2] - o.renderX) * 0.5;
+        o.renderY += (o.pos[index 3] - o.renderY) * 0.5;
+      } else {
+        o.renderX = o.pos[index 2];
+        o.renderY = o.pos[index 3];
+      }
     } else {
       const smooth = 1 - Math.pow(0.001, dt);
-      o.renderX += (o.pos[2] - o.renderX) * smooth;
-      o.renderY += (o.pos[3] - o.renderY) * smooth;
+      o.renderX += (o.pos[index 2] - o.renderX) * smooth;
+      o.renderY += (o.pos[index 3] - o.renderY) * smooth;
     }
   }
-
-
 
   if (o.id == playerid) {
     moveX = 0;
@@ -769,23 +775,22 @@ objects.forEach(o => {
         ctx.fillStyle = '#ffffff';
         ctx.fillText(o.name, 0, -radius - 1);
       }
-      if (!Array.isArray(o.hp)) o.hp = [o.hp, 100]
-      if (o.hp[0] < o.hp[1] && drawAlpha > 0.05) {
+      if (!Array.isArray(o.hp)) o.hp = [o.hp, (Number(o.xp) / 2) + 50]
+      if (typeof o.hp === 'number' && o.hp < 100 && drawAlpha > 0.05) {
         const barW = radius * 2.4;
         const barH = 3.5;
-        const pct = Math.max(0, Math.min(1, o.hp[0] / o.hp[1]));
-
+        const pct = Math.max(0, Math.min(1, o.hp / 100));
+      
         ctx.fillStyle = '#555555';
         ctx.fillRect(-barW / 2, radius + 4, barW, barH);
-
+      
         ctx.fillStyle = '#85e37d';
         ctx.fillRect(-barW / 2, radius + 4, barW * pct, barH);
-
+      
         ctx.strokeStyle = '#333333';
         ctx.lineWidth = 0.8;
         ctx.strokeRect(-barW / 2, radius + 4, barW, barH);
       }
-
 
       ctx.restore();
     }
