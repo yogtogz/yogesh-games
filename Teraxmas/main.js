@@ -776,21 +776,22 @@ objects.forEach(o => {
         ctx.fillText(o.name, 0, -radius - 1);
       }
       if (!Array.isArray(o.hp)) o.hp = [o.hp, (Number(o.xp) / 2) + 50]
-      if (typeof o.hp === 'number' && o.hp < 100 && drawAlpha > 0.05) {
+      if (Array.isArray(o.hp) && o.hp[0] < 100 && drawAlpha > 0.05) {
         const barW = radius * 2.4;
         const barH = 3.5;
-        const pct = Math.max(0, Math.min(1, o.hp / 100));
-      
+        const pct = Math.max(0, Math.min(1, o.hp[0] / 100));
+
         ctx.fillStyle = '#555555';
         ctx.fillRect(-barW / 2, radius + 4, barW, barH);
-      
+
         ctx.fillStyle = '#85e37d';
         ctx.fillRect(-barW / 2, radius + 4, barW * pct, barH);
-      
+
         ctx.strokeStyle = '#333333';
         ctx.lineWidth = 0.8;
         ctx.strokeRect(-barW / 2, radius + 4, barW, barH);
       }
+
 
       ctx.restore();
     }
