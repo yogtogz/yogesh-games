@@ -564,18 +564,18 @@ objects.forEach(o => {
     if (o.library === 'bullet' || typeof o.renderX !== 'number') {
       // Bullets move linearly with zero exponential lag so they never curve!
       if (o.library === 'bullet' && typeof o.renderX === 'number') {
-        o.renderX += (o.pos[index 4] || 0) * (dt / 0.05);
-        o.renderY += (o.pos[index 5] || 0) * (dt / 0.05);
-        o.renderX += (o.pos[index 2] - o.renderX) * 0.5;
-        o.renderY += (o.pos[index 3] - o.renderY) * 0.5;
+        o.renderX += (o.pos[4] || 0) * (dt / 0.05);
+        o.renderY += (o.pos[5] || 0) * (dt / 0.05);
+        o.renderX += (o.pos[2] - o.renderX) * 0.5;
+        o.renderY += (o.pos[3] - o.renderY) * 0.5;
       } else {
-        o.renderX = o.pos[index 2];
-        o.renderY = o.pos[index 3];
+        o.renderX = o.pos[2];
+        o.renderY = o.pos[3];
       }
     } else {
       const smooth = 1 - Math.pow(0.001, dt);
-      o.renderX += (o.pos[index 2] - o.renderX) * smooth;
-      o.renderY += (o.pos[index 3] - o.renderY) * smooth;
+      o.renderX += (o.pos[2] - o.renderX) * smooth;
+      o.renderY += (o.pos[3] - o.renderY) * smooth;
     }
   }
 
